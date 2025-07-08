@@ -10,6 +10,9 @@
 - **Node.js**: v18 or later for the development environment
 - **npm/yarn**: For package management
 
+## MCP usage
+- You will use mcp tool "Context7" to get latest document, when implement functions related to "React", "D3.js", "Tailwind CSS", "Recoil".   You should use best practices to implement the function. You should check the correnct version of libraries first.
+
 ## Development Setup
 - The project is set up as a standard Create React App project.
 - Dependencies are managed via `package.json`.
@@ -19,6 +22,8 @@
 - **CORS**: The application is subject to Cross-Origin Resource Sharing policies, which may require a proxy server for fetching mind map files from external domains.
 - **Browser Compatibility**: The application relies on modern browser features, including the `fetch` API and `DOMParser`.
 - **Performance**: Large mind maps with thousands of nodes may present performance challenges that require optimization techniques like virtualization.
+- Platform Compatibility: This SPA runs on modern browsers such as Chrome, Safari. On Windows, Mac, iOS, Andriod.
+- Simplicity : This SPA dose not call any server side API via AJAX, only load the single mind map file via HTTP.
 
 ## Dependencies and Tool Configurations
 - **`recoil`**: For state management.
