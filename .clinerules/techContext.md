@@ -24,6 +24,7 @@
 - **Performance**: Large mind maps with thousands of nodes may present performance challenges that require optimization techniques like virtualization.
 - Platform Compatibility: This SPA runs on modern browsers such as Chrome, Safari. On Windows, Mac, iOS, Andriod.
 - Simplicity : This SPA dose not call any server side API via AJAX, only load the single mind map file via HTTP.
+- YOU MUST DO NOT chanage existing react useEffect dependencies
 
 ## Dependencies and Tool Configurations
 - **`recoil`**: For state management.
