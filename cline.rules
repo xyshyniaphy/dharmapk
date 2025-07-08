@@ -1,0 +1,56 @@
+{
+  "project_type": "react",
+  "main_file": "src/App.tsx",
+  "documentation_entrypoint": "README.md",
+  "rules": [
+    {
+      "name": "Explain Project Purpose",
+      "description": "Provide a high-level overview of the interactive mind map application.",
+      "context": [
+        "This is a web-based mind mapping tool built with React and D3.js.",
+        "It focuses on unique layouts like parent-path highlighting and vertical leaf node alignment.",
+        "The UI is decoupled from data sources and can render maps from text or JSON data."
+      ],
+      "file_dependencies": ["README.md", "src/App.tsx"]
+    },
+    {
+      "name": "Explain D3 Visualization",
+      "description": "Detail how D3.js is used for rendering the mind map.",
+      "context": [
+        "D3.js is used for dynamic and custom SVG rendering of the mind map.",
+        "The core logic for the visualization is located in the 'src/d3/' directory.",
+        "The MindMap component in 'src/components/MindMap/' is responsible for integrating D3 with React."
+      ],
+      "file_dependencies": ["src/d3/", "src/components/MindMap/"]
+    },
+    {
+      "name": "Explain Component Structure",
+      "description": "Describe the organization of React components.",
+      "context": [
+        "Reusable React components are in 'src/components/'.",
+        "Generic UI elements (like buttons) are in 'src/components/ui/'.",
+        "The main application component is 'src/App.tsx'."
+      ],
+      "file_dependencies": ["src/components/", "src/App.tsx"]
+    },
+    {
+        "name": "Explain State Management",
+        "description": "Describe how state is managed in the application.",
+        "context": [
+            "The application uses React Hooks for state management.",
+            "For more complex state logic, 'useReducer' is employed."
+        ],
+        "file_dependencies": ["src/hooks/", "src/App.tsx"]
+    },
+    {
+      "name": "Run the Project",
+      "description": "Explain how to set up and run the project locally.",
+      "context": [
+        "To run the project, first install dependencies with 'npm install'.",
+        "Then, start the development server with 'npm start'.",
+        "The application will be available at http://localhost:3000."
+      ],
+      "file_dependencies": ["package.json", "README.md"]
+    }
+  ]
+}
