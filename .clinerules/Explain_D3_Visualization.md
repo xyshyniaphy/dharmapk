@@ -4,7 +4,7 @@
 
 **Context:**
 - D3.js is used for dynamic and custom SVG rendering of the mind map.
-- The core logic for the visualization is located in the 'src/d3/' directory.
+- The core logic for the visualization is located in the 'src/d3/' directory. See `layoutImplementation.md` for the detailed specification of the auto-layout algorithm.
 - The MindMap component in 'src/components/MindMap/' is responsible for integrating D3 with React.
 
 **File Dependencies:**
