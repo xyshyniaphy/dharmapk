@@ -19,7 +19,7 @@
 - The development server is run with `npm start` or `yarn start`.
 
 ## Technical Constraints
-- **CORS**: The application is subject to Cross-Origin Resource Sharing policies, which may require a proxy server for fetching mind map files from external domains.
+- **CORS**: The application is subject to Cross-Origin Resource Sharing policies, Which is a used for loading mindmap file.
 - **Browser Compatibility**: The application relies on modern browser features, including the `fetch` API and `DOMParser`.
 - **Performance**: Large mind maps with thousands of nodes may present performance challenges that require optimization techniques like virtualization.
 - Platform Compatibility: This SPA runs on modern browsers such as Chrome, Safari. On Windows, Mac, iOS, Andriod.

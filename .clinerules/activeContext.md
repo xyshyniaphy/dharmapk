@@ -11,7 +11,6 @@
 - The initial data parsing logic for FreeMind (`.mm`) files has been outlined.
 
 ## Active Decisions and Considerations
-- **CORS Policy**: How to handle Cross-Origin Resource Sharing when fetching mind map files from different domains. A proxy server may be required.
 - **Error Handling**: Defining a robust error handling strategy for file fetching and parsing.
 - **Extensibility**: Planning for future support of other file formats like XMind and MindMeister.
 
