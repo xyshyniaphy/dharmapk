@@ -4,7 +4,7 @@
 
 **Context:**
 - The application uses React Hooks for state management.
-- For more complex state logic, 'useReducer' is employed.
+- For more complex state logic, 'useRecoil' is employed.
 
 **File Dependencies:**
 - src/hooks/
