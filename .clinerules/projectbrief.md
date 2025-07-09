@@ -287,3 +287,119 @@ You **MUST** initiate task handoffs in these scenarios:
 You **MUST** monitor the context window usage in the environment details section. When it exceeds 50% (e.g., "105,000 / 200,000 tokens (53%)"), you **MUST** proactively initiate the task handoff process using the `ask_followup_question` tool followed by the `new_task` tool. You MUST use the `new_task` tool.
 
 By strictly following these guidelines, you'll ensure smooth transitions between tasks, maintain project momentum, and provide the best possible experience for users working on complex, multi-session projects.
+
+
+
+
+--------
+# Tech Context: Interactive Mind Map UI
+
+## Technologies and Frameworks
+- **React**: v18+ with TypeScript
+- **Recoil**: For state management
+- **React Router**: For client-side routing
+- **D3.js**: v7 for data visualization and SVG rendering
+- **Styled-components**: For component-level styling
+- **Tailwind CSS**: For utility-first styling
+- **Node.js**: v18 or later for the development environment
+- **npm/yarn**: For package management
+
+## MCP usage
+- You will use mcp tool "Context7" to get latest document, when implement functions related to "React", "D3.js", "Tailwind CSS", "Recoil".   You should use best practices to implement the function. You should check the correnct version of libraries first.
+
+## Development Setup
+- The project is set up as a standard Create React App project.
+- Dependencies are managed via `package.json`.
+- The development server is run with `npm start` or `yarn start`.
+
+## Technical Constraints
+- **CORS**: The application is subject to Cross-Origin Resource Sharing policies, Which is a used for loading mindmap file.
+- **Browser Compatibility**: The application relies on modern browser features, including the `fetch` API and `DOMParser`.
+- **Performance**: Large mind maps with thousands of nodes may present performance challenges that require optimization techniques like virtualization.
+- Platform Compatibility: This SPA runs on modern browsers such as Chrome, Safari. On Windows, Mac, iOS, Andriod.
+- Simplicity : This SPA dose not call any server side API via AJAX, only load the single mind map file via HTTP.
+- YOU MUST DO NOT chanage existing react useEffect dependencies
+
+## Dependencies and Tool Configurations
+- **`recoil`**: For state management.
+- **`react-router-dom`**: For routing.
+- **`d3`**: For visualization.
+- **`styled-components`**: For styling.
+- **`eslint`**: For code linting.
+- **`vite`**: As the build tool (inferred from the project files).
+
+
+-----------
+# Explain State Management
+
+**Description:** Describe how state is managed in the application.
+
+**Context:**
+- The application uses React Hooks for state management.
+- For more complex state logic, 'useRecoil' is employed.
+
+**File Dependencies:**
+- src/hooks/
+- src/App.tsx
+
+
+
+-------------
+# Explain Component Structure
+
+**Description:** Describe the organization of React components.
+
+**Context:**
+- Reusable React components are in 'src/components/'.
+- Generic UI elements (like buttons) are in 'src/components/ui/'.
+- The main application component is 'src/App.tsx'.
+
+**File Dependencies:**
+- src/components/
+- src/App.tsx
+
+
+
+---------
+
+# Run the Project
+
+**Description:** Explain how to set up and run the project locally.
+
+**Context:**
+- To run the project, first install dependencies with 'npm install'.
+- Then, start the development server with 'npm start'.
+- The application will be available at http://localhost:3000.
+
+**File Dependencies:**
+- package.json
+- README.md
+
+
+
+
+----------------
+
+
+# System Patterns: Interactive Mind Map UI
+
+## System Architecture
+The application is a Single Page Application (SPA) built with React. It follows a component-based architecture. The core of the application is a data-driven visualization engine powered by D3.js.
+
+## Key Technical Decisions
+- **State Management**: Recoil is used for its atomic state management capabilities, allowing for efficient and decoupled state updates.
+- **Rendering**: D3.js is used for rendering the mind map as an SVG, providing maximum flexibility for custom layouts and interactions.
+- **Styling**: A combination of Styled-components and Tailwind CSS is used for styling, allowing for both component-level and utility-first CSS.
+- **Data Flow**: The application follows a unidirectional data flow. Data is fetched, parsed, and stored in a global Recoil atom. Components then subscribe to this atom and re-render when the data changes.
+
+## Design Patterns
+- **Component-Based Architecture**: The UI is broken down into reusable React components.
+- **Hooks**: Custom hooks (like `useMindMapData` in the initial plan) are used to encapsulate and reuse logic, such as data fetching and parsing.
+- **Data-Driven Visualization**: The D3.js implementation is data-driven, meaning the visualization is a direct representation of the application's state.
+- **Global State Management**: A central Recoil store is used to manage the application's global state, such as the mind map data.
+
+## Component Relationships
+- **`App.js`**: The root component, responsible for setting up routing and the Recoil root.
+- **`Viewer.js`**: A container component that handles the logic for fetching and parsing data, and manages loading and error states.
+- **`MindMapCanvas.js`**: A presentational component that takes the mind map data from the Recoil store and renders it using D3.js.
+- **`xmlParser.js`**: A utility module that is decoupled from the UI and is responsible for parsing the mind map file format.
