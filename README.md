@@ -202,7 +202,29 @@ A factory pattern in the `Viewer` component determines which parser to use based
 
 ---
 
-## 8. Component and Styling Guide (组件与样式指南)
+## 8. Tool Panel (工具面板)
+
+### English
+
+The application includes a tool panel at the bottom of the screen with the following features:
+- **Node Column Width**: Adjust the spacing between columns of nodes.
+- **Vertical Text**: Toggle vertical text display for non-leaf nodes.
+- **Line Type**: Switch between different connector line styles (curved, straight, right-angled, rounded-angled).
+
+All settings are saved to the browser's LocalStorage and persist between sessions.
+
+### 中文
+
+应用程序在屏幕底部包含一个工具面板，具有以下功能：
+- **节点列宽**: 调整节点列之间的间距。
+- **垂直文本**: 切换非叶节点的垂直文本显示。
+- **连线类型**: 在不同的连接线样式（曲线、直线、直角折线、圆角折线）之间切换。
+
+所有设置都保存到浏览器的 LocalStorage 中，并在会话之间保持不变。
+
+---
+
+## 9. Component and Styling Guide (组件与样式指南)
 
 ### English
 
@@ -230,7 +252,7 @@ A factory pattern in the `Viewer` component determines which parser to use based
 
 ---
 
-## 9. Project Status (项目状态)
+## 10. Project Status (项目状态)
 
 ### English
 
