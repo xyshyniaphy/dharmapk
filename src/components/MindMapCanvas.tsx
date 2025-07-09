@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import * as d3 from 'd3';
 import { mindMapDataAtom } from '../state/mindMapStore';
+import { settingsAtom } from '../state/settingsStore';
 import type { Node as MindMapNode } from '../types';
 import NavigationPanel from './NavigationPanel';
 import './MindMapCanvas.css';
@@ -9,6 +10,7 @@ import './MindMapCanvas.css';
 function MindMapCanvas(): React.ReactElement {
   const svgRef = useRef<SVGSVGElement>(null);
   const mindMapData = useAtomValue(mindMapDataAtom);
+  const settings = useAtomValue(settingsAtom);
   const [pinnedNode, setPinnedNode] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
   const [hoveredPath, setHoveredPath] = useState<string[]>([]);
 
@@ -80,7 +82,7 @@ function MindMapCanvas(): React.ReactElement {
       // Custom layout logic with dynamic row height for leaf nodes
       const baseNodeHeight = 40; // Base height for a single-line node
       const lineHeight = 15;    // Additional height for each extra line
-      const nodeWidth = 220;    // Horizontal spacing between depth levels
+      const nodeWidth = settings.nodeColumnWidth;    // Horizontal spacing between depth levels
 
       let maxDepth = 0;
       root.each(d => {
@@ -124,15 +126,36 @@ function MindMapCanvas(): React.ReactElement {
       const g = svg.append('g');
 
       // Links
+      const getLinkPath = (d: d3.Link<any, d3.HierarchyPointNode<MindMapNode>, d3.HierarchyPointNode<MindMapNode>>) => {
+        const sourceY = (d.source as any).y;
+        const sourceX = (d.source as any).x;
+        const targetY = (d.target as any).y;
+        const targetX = (d.target as any).x;
+
+        switch (settings.lineType) {
+          case 'straight':
+            return `M${sourceY},${sourceX}L${targetY},${targetX}`;
+          case 'right-angled':
+            return `M${sourceY},${sourceX}H${sourceY + (targetY - sourceY) / 2}V${targetX}H${targetY}`;
+          case 'rounded-angled':
+            const cornerRadius = 10;
+            const halfY = sourceY + (targetY - sourceY) / 2;
+            const xDir = sourceX < targetX ? 1 : -1;
+            const yDir = sourceY < targetY ? 1 : -1;
+            return `M${sourceY},${sourceX} H${halfY - cornerRadius * yDir} A${cornerRadius},${cornerRadius} 0 0 ${yDir * xDir > 0 ? 1 : 0} ${halfY},${sourceX + cornerRadius * xDir} V${targetX - cornerRadius * xDir} A${cornerRadius},${cornerRadius} 0 0 ${yDir * xDir > 0 ? 0 : 1} ${halfY + cornerRadius * yDir},${targetX} H${targetY}`;
+          case 'curved':
+          default:
+            const midY = sourceY + (targetY - sourceY) / 2;
+            return `M${sourceY},${sourceX}C${midY},${sourceX} ${midY},${targetX} ${targetY},${targetX}`;
+        }
+      };
+
       g.selectAll('.link')
         .data(root.links())
         .enter()
         .append('path')
         .attr('class', 'link')
-        .attr('d', d3.linkHorizontal()
-          .x(d => (d as any).y)
-          .y(d => (d as any).x) as any
-        );
+        .attr('d', getLinkPath as any);
 
       // Nodes
       const node = g.selectAll('.node')
@@ -155,11 +178,24 @@ function MindMapCanvas(): React.ReactElement {
           const text = d3.select(this);
           const lines = d.data.text.split('\n');
           text.text(null);
-          for (let i = 0; i < lines.length; i++) {
-            text.append('tspan')
-              .attr('x', d.children ? -13 : 13)
-              .attr('dy', i === 0 ? '0.35em' : '1.2em')
-              .text(lines[i]);
+
+          if (settings.verticalText && d.children) {
+            text.style('text-anchor', 'middle');
+            const originalText = lines.join('\n');
+            const chars = originalText.split('');
+            for (let i = 0; i < chars.length; i++) {
+              text.append('tspan')
+                .attr('x', d.children ? -13 : 13)
+                .attr('dy', '1.2em')
+                .text(chars[i]);
+            }
+          } else {
+            for (let i = 0; i < lines.length; i++) {
+              text.append('tspan')
+                .attr('x', d.children ? -13 : 13)
+                .attr('dy', i === 0 ? '0.35em' : '1.2em')
+                .text(lines[i]);
+            }
           }
         });
 
@@ -172,7 +208,7 @@ function MindMapCanvas(): React.ReactElement {
       svg.call(zoom);
       svg.call(zoom.transform, d3.zoomIdentity.translate(100, yOffset > 0 ? yOffset : 0));
     }
-  }, [mindMapData, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick, applyHighlight, clearAllHighlights]);
+  }, [mindMapData, settings, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick, applyHighlight, clearAllHighlights]);
 
   if (!mindMapData) {
     return <div>Loading mind map...</div>;
