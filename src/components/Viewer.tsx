@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { mindMapDataState } from '../state/mindMapAtom';
 
@@ -15,15 +15,25 @@ import type { Node } from '../types';
 function Viewer(): React.ReactElement {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [urlInput, setUrlInput] = useState('');
   const setMindMapData = useSetRecoilState(mindMapDataState);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleUrlSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (urlInput) {
+      navigate(`?file=${encodeURIComponent(urlInput)}`);
+    }
+  };
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const mapUrl = searchParams.get('file');
 
     if (!mapUrl) {
-      setError('No file URL provided. Use the format: ?file=URL');
+      setMindMapData(null);
+      setError(null);
       return;
     }
 
@@ -69,6 +79,26 @@ function Viewer(): React.ReactElement {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div style={{ padding: '20px', color: 'red', fontFamily: 'sans-serif' }}><strong>Error:</strong> {error}</div>;
+
+  const searchParams = new URLSearchParams(location.search);
+  const mapUrl = searchParams.get('file');
+
+  if (!mapUrl) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <form onSubmit={handleUrlSubmit}>
+          <input
+            type="text"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            placeholder="Enter Mind Map URL"
+            style={{ padding: '10px', width: '300px', marginRight: '10px' }}
+          />
+          <button type="submit" style={{ padding: '10px 20px' }}>Open</button>
+        </form>
+      </div>
+    );
+  }
 
   return <MindMapCanvas />;
 }
