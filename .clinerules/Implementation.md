@@ -537,3 +537,24 @@ useEffect(() => {
     .style('cursor', d => d.depth === 0 ? 'default' : 'pointer'); // Visual cue
 
 }, [data, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick]); // Add handlers to dependency array
+
+-----
+
+### **Part 6: Zoom and Pan**
+
+This feature allows users to zoom in and out, and pan across the mind map for better navigation.
+
+#### **Step 1: Implement D3 Zoom**
+
+The zoom functionality is implemented using `d3.zoom`. The zoom behavior is attached to the main SVG element, and the transform is applied to the group element containing the mind map.
+
+```javascript
+// Inside MindMapCanvas.tsx, in the useEffect hook
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 3]) // Set zoom range
+  .on('zoom', (event) => {
+    g.attr('transform', event.transform);
+  });
+
+svg.call(zoom);

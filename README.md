@@ -26,7 +26,7 @@ This project addresses the need for a highly interactive and visually clear mind
 The application is a Single Page Application (SPA).
 1.  A user provides a URL to a mind map file.
 2.  The application fetches, parses, and renders the data.
-3.  The user can interact with the mind map (pan, zoom, hover).
+3.  The user can interact with the mind map by panning, zooming, and hovering over nodes to see relationships.
 4.  Rendering is handled by D3.js.
 5.  State is managed globally using Jotai.
 
@@ -51,7 +51,7 @@ The application is a Single Page Application (SPA).
 该应用程序是一个单页应用程序 (SPA)。
 1.  用户提供一个思维导图文件的URL。
 2.  应用程序获取、解析和渲染数据。
-3.  用户可以与思维导图进行交互（平移、缩放、悬停）。
+3.  用户可以通过平移、缩放和悬停在节点上与思维导图进行交互，以查看关系。
 4.  渲染由 D3.js 处理。
 5.  状态使用 Jotai 进行全局管理。
 
@@ -238,14 +238,16 @@ A factory pattern in the `Viewer` component determines which parser to use based
 - The project has a defined architecture and technology stack.
 - The core data flow and component structure have been planned.
 
+**What Works:**
+- The project has a defined architecture and technology stack.
+- The core data flow and component structure have been planned.
+- All parsers for `.xmind`, `.mm`, and `.mind` files are implemented.
+- Interactive features like hover highlighting, click-to-pin, and zoom/pan are fully functional.
+
 **What's Left to Build:**
-- Component Implementation (`Viewer`, `MindMapCanvas`, etc.).
-- D3.js Rendering Logic.
-- Data Fetching and Parsing logic.
-- User Interactions (panning, zooming).
-- Styling.
-- Error Handling.
-- CORS Solution.
+- Styling improvements.
+- Robust error handling.
+- A solution for potential CORS issues when fetching files from external domains.
 
 ### 中文
 
@@ -253,11 +255,13 @@ A factory pattern in the `Viewer` component determines which parser to use based
 - 项目已定义了架构和技术栈。
 - 核心数据流和组件结构已规划好。
 
+**已完成的工作:**
+- 项目已定义了架构和技术栈。
+- 核心数据流和组件结构已规划好。
+- `.xmind`、`.mm` 和 `.mind` 文件的所有解析器均已实现。
+- 悬停高亮、点击固定和缩放/平移等交互功能已完全实现。
+
 **待构建的内容:**
-- 组件实现 (`Viewer`, `MindMapCanvas` 等)。
-- D3.js 渲染逻辑。
-- 数据获取和解析逻辑。
-- 用户交互（平移、缩放）。
-- 样式设计。
-- 错误处理。
-- CORS 解决方案。
+- 样式改进。
+- 强大的错误处理。
+- 针对从外部域获取文件时可能出现的 CORS 问题的解决方案。
