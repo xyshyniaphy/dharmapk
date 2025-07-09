@@ -1,9 +1,9 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { mindMapDataState } from '../state/mindMapAtom';
+import { useAtomValue } from 'jotai';
+import { mindMapDataAtom } from '../state/mindMapStore';
 
 function MindMapCanvas(): React.ReactElement {
-  const mindMapData = useRecoilValue(mindMapDataState);
+  const mindMapData = useAtomValue(mindMapDataAtom);
 
   if (!mindMapData) {
     return <div>No mind map data loaded.</div>;

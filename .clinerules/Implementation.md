@@ -227,8 +227,8 @@ This version imports all three parsers and includes the logic to decide which on
 // src/components/Viewer.js
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
-import { mindMapDataState } from '../state/mindMapAtom';
+import { useSetAtom } from 'jotai';
+import { mindMapDataAtom } from '../state/mindMapAtom';
 
 // Import all the parsers
 import { parseFreeMindXml } from '../utils/xmlParser';
@@ -241,7 +241,7 @@ import LoadingSpinner from './LoadingSpinner';
 function Viewer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const setMindMapData = useSetRecoilState(mindMapDataState);
+  const setMindMapData = useSetAtom(mindMapDataAtom);
   const location = useLocation();
 
   useEffect(() => {

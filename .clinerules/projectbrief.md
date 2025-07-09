@@ -15,7 +15,7 @@ The application is a Single Page Application (SPA) that functions as a mind map 
 2.  The application fetches, parses, and renders the mind map data in the browser.
 3.  The user can interact with the rendered mind map by panning, zooming, and hovering over nodes to see relationships.
 4.  The core rendering is handled by D3.js, which provides a dynamic and interactive SVG-based visualization.
-5.  State, such as the loaded mind map data, is managed globally using Recoil.
+5.  State, such as the loaded mind map data, is managed globally using Jotai.
 
 ## Core Requirements and Goals
 - **Visualize Hierarchical Data**: The primary goal is to render mind maps from structured data (initially text-based or JSON).
@@ -297,7 +297,7 @@ By strictly following these guidelines, you'll ensure smooth transitions between
 
 ## Technologies and Frameworks
 - **React**: v18+ with TypeScript
-- **Recoil**: For state management
+- **Jotai**: For state management
 - **React Router**: For client-side routing
 - **D3.js**: v7 for data visualization and SVG rendering
 - **Styled-components**: For component-level styling
@@ -322,7 +322,7 @@ By strictly following these guidelines, you'll ensure smooth transitions between
 - YOU MUST DO NOT chanage existing react useEffect dependencies
 
 ## Dependencies and Tool Configurations
-- **`recoil`**: For state management.
+- **`jotai`**: For state management.
 - **`react-router-dom`**: For routing.
 - **`d3`**: For visualization.
 - **`styled-components`**: For styling.
@@ -337,7 +337,7 @@ By strictly following these guidelines, you'll ensure smooth transitions between
 
 **Context:**
 - The application uses React Hooks for state management.
-- For more complex state logic, 'useRecoil' is employed.
+- For more complex state logic, 'useAtom' is employed.
 
 **File Dependencies:**
 - src/hooks/
@@ -388,10 +388,10 @@ By strictly following these guidelines, you'll ensure smooth transitions between
 The application is a Single Page Application (SPA) built with React. It follows a component-based architecture. The core of the application is a data-driven visualization engine powered by D3.js.
 
 ## Key Technical Decisions
-- **State Management**: Recoil is used for its atomic state management capabilities, allowing for efficient and decoupled state updates.
+- **State Management**: Jotai is used for its atomic state management capabilities, allowing for efficient and decoupled state updates.
 - **Rendering**: D3.js is used for rendering the mind map as an SVG, providing maximum flexibility for custom layouts and interactions.
 - **Styling**: A combination of Styled-components and Tailwind CSS is used for styling, allowing for both component-level and utility-first CSS.
-- **Data Flow**: The application follows a unidirectional data flow. Data is fetched, parsed, and stored in a global Recoil atom. Components then subscribe to this atom and re-render when the data changes.
+- **Data Flow**: The application follows a unidirectional data flow. Data is fetched, parsed, and stored in a global Jotai atom. Components then subscribe to this atom and re-render when the data changes.
 
 ## Design Patterns
 - **Component-Based Architecture**: The UI is broken down into reusable React components.
@@ -400,7 +400,7 @@ The application is a Single Page Application (SPA) built with React. It follows 
 - **Global State Management**: A central Recoil store is used to manage the application's global state, such as the mind map data.
 
 ## Component Relationships
-- **`App.js`**: The root component, responsible for setting up routing and the Recoil root.
+- **`App.js`**: The root component, responsible for setting up routing and the Jotai provider.
 - **`Viewer.js`**: A container component that handles the logic for fetching and parsing data, and manages loading and error states.
-- **`MindMapCanvas.js`**: A presentational component that takes the mind map data from the Recoil store and renders it using D3.js.
+- **`MindMapCanvas.js`**: A presentational component that takes the mind map data from the Jotai store and renders it using D3.js.
 - **`xmlParser.js`**: A utility module that is decoupled from the UI and is responsible for parsing the mind map file format.

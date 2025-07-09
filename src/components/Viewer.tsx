@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
-import { mindMapDataState } from '../state/mindMapAtom';
+import { useSetAtom } from 'jotai';
+import { mindMapDataAtom } from '../state/mindMapStore';
 
 // Import all the parsers
 import { parseFreeMindXml } from '../utils/xmlParser';
@@ -16,7 +16,7 @@ function Viewer(): React.ReactElement {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState('');
-  const setMindMapData = useSetRecoilState(mindMapDataState);
+  const setMindMapData = useSetAtom(mindMapDataAtom);
   const location = useLocation();
   const navigate = useNavigate();
 

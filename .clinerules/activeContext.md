@@ -6,7 +6,7 @@
 - Establishing the foundation for the D3.js rendering engine.
 
 ## Recent Changes
-- The state management library has been decided as Recoil.
+- The state management library has been decided as Jotai.
 - The core folder structure has been defined.
 - The initial data parsing logic for XMind (`.xmind`) files has been outlined.
 
@@ -25,7 +25,7 @@
 ## What Works
 - The project has a defined architecture and technology stack.
 - The core data flow and component structure have been planned.
-- The initial setup for a React application with Recoil, React Router, and D3.js is understood.
+- The initial setup for a React application with Jotai, React Router, and D3.js is understood.
 
 ## What's Left to Build
 - **Component Implementation**: The actual React components (`Viewer`, `MindMapCanvas`, etc.) need to be coded.
@@ -42,4 +42,4 @@
 - **Performance**: The performance of the application with very large mind maps is unknown and may require optimization.
 
 ## Evolution of Project Decisions
-- The state management library was initially considered as Zustand but has been updated to Recoil based on the latest technical guide.
+- The state management library was previously Recoil, but has been updated to Jotai to ensure compatibility with React 19.
