@@ -17,129 +17,11 @@ const Node = {
 
 -----
 
-### \#\# Part 1: FreeMind (`.mm`) Parser Implementation
-
-This is your baseline XML parser.
-
-#### **Step 1.1: Create `src/utils/xmlParser.js`**
-
-This file will contain the logic for parsing the FreeMind `.mm` format.
-
-#### **Step 1.2: Add the Parser Code**
-
-```javascript
-// src/utils/xmlParser.js
-
-/**
- * Recursively parses an XML node from a FreeMind file.
- * @param {Element} xmlNode - The XML element to parse.
- * @returns {object} A standardized Node object.
- */
-function parseFreeMindNode(xmlNode) {
-  const node = {
-    id: xmlNode.getAttribute('ID'),
-    text: xmlNode.getAttribute('TEXT') || '',
-    children: [],
-    attributes: {
-      position: xmlNode.getAttribute('POSITION'),
-      created: xmlNode.getAttribute('CREATED'),
-      modified: xmlNode.getAttribute('MODIFIED'),
-    },
-  };
-
-  // Recursively parse child nodes
-  const childNodes = Array.from(xmlNode.children).filter(child => child.tagName === 'node');
-  node.children = childNodes.map(parseFreeMindNode);
-
-  return node;
-}
-
-/**
- * Parses a FreeMind .mm file string into a standardized object.
- * @param {string} xmlString - The raw XML content of the .mm file.
- * @returns {object} The root Node object of the mind map.
- */
-export function parseFreeMindXml(xmlString) {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-  
-  // Check for parsing errors
-  const parseError = xmlDoc.querySelector('parsererror');
-  if (parseError) {
-    throw new Error('Failed to parse XML. Please check the file format.');
-  }
-
-  const rootNode = xmlDoc.querySelector('map > node');
-  if (!rootNode) {
-    throw new Error('Invalid FreeMind file: Could not find the root node.');
-  }
-
-  return parseFreeMindNode(rootNode);
-}
-```
-
------
-
-### \#\# Part 2: MindMeister (`.mind`) Parser Implementation
-
-This parser handles the JSON format from MindMeister.
-
-#### **Step 2.1: Create `src/utils/mindMeisterParser.js`**
-
-This file will be responsible for converting `.mind` JSON into our standard format.
-
-#### **Step 2.2: Add the Parser Code**
-
-MindMeister's JSON format is already hierarchical. We just need to map its property names to our own.
-
-```javascript
-// src/utils/mindMeisterParser.js
-
-/**
- * Recursively parses a node from a MindMeister JSON object.
- * @param {object} mindMeisterNode - The node from the original MindMeister JSON.
- * @returns {object} A standardized Node object.
- */
-function parseMindMeisterNode(mindMeisterNode) {
-  const node = {
-    id: mindMeisterNode.id,
-    text: mindMeisterNode.title || '',
-    children: [],
-    attributes: {
-      rank: mindMeisterNode.rank,
-      // Add any other attributes you want to preserve
-    },
-  };
-
-  // Recursively parse child nodes if they exist
-  if (mindMeisterNode.children && mindMeisterNode.children.length > 0) {
-    node.children = mindMeisterNode.children.map(parseMindMeisterNode);
-  }
-
-  return node;
-}
-
-/**
- * Parses a MindMeister .mind file (as a JS object) into a standardized object.
- * @param {object} mindJson - The JavaScript object parsed from the .mind file's JSON.
- * @returns {object} The root Node object of the mind map.
- */
-export function parseMindMeisterJson(mindJson) {
-  if (!mindJson || !mindJson.root || !mindJson.root.id) {
-    throw new Error('Invalid MindMeister file: Root node is missing or invalid.');
-  }
-  
-  return parseMindMeisterNode(mindJson.root);
-}
-```
-
------
-
-### \#\# Part 3: XMind (`.xmind`) Parser Implementation
+### \#\# Part 1: XMind (`.xmind`) Parser Implementation
 
 This is the most complex parser because it requires unzipping the file first.
 
-#### **Step 3.1: Install JSZip**
+#### **Step 1.1: Install JSZip**
 
 You'll need a library to handle the `.zip` archive in the browser. JSZip is perfect for this.
 
@@ -147,11 +29,11 @@ You'll need a library to handle the `.zip` archive in the browser. JSZip is perf
 npm install jszip
 ```
 
-#### **Step 3.2: Create `src/utils/xmindParser.js`**
+#### **Step 1.2: Create `src/utils/xmindParser.js`**
 
 This file will contain all the logic for fetching, unzipping, and parsing the `.xmind` file.
 
-#### **Step 3.3: Add the Parser Code**
+#### **Step 1.3: Add the Parser Code**
 
 The process involves finding `content.xml` within the zip archive and then parsing it.
 
@@ -215,6 +97,124 @@ export async function parseXmindFile(blob) {
 
 -----
 
+### \#\# Part 2: FreeMind (`.mm`) Parser Implementation
+
+This is your baseline XML parser.
+
+#### **Step 2.1: Create `src/utils/xmlParser.js`**
+
+This file will contain the logic for parsing the FreeMind `.mm` format.
+
+#### **Step 2.2: Add the Parser Code**
+
+```javascript
+// src/utils/xmlParser.js
+
+/**
+ * Recursively parses an XML node from a FreeMind file.
+ * @param {Element} xmlNode - The XML element to parse.
+ * @returns {object} A standardized Node object.
+ */
+function parseFreeMindNode(xmlNode) {
+  const node = {
+    id: xmlNode.getAttribute('ID'),
+    text: xmlNode.getAttribute('TEXT') || '',
+    children: [],
+    attributes: {
+      position: xmlNode.getAttribute('POSITION'),
+      created: xmlNode.getAttribute('CREATED'),
+      modified: xmlNode.getAttribute('MODIFIED'),
+    },
+  };
+
+  // Recursively parse child nodes
+  const childNodes = Array.from(xmlNode.children).filter(child => child.tagName === 'node');
+  node.children = childNodes.map(parseFreeMindNode);
+
+  return node;
+}
+
+/**
+ * Parses a FreeMind .mm file string into a standardized object.
+ * @param {string} xmlString - The raw XML content of the .mm file.
+ * @returns {object} The root Node object of the mind map.
+ */
+export function parseFreeMindXml(xmlString) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+  
+  // Check for parsing errors
+  const parseError = xmlDoc.querySelector('parsererror');
+  if (parseError) {
+    throw new Error('Failed to parse XML. Please check the file format.');
+  }
+
+  const rootNode = xmlDoc.querySelector('map > node');
+  if (!rootNode) {
+    throw new Error('Invalid FreeMind file: Could not find the root node.');
+  }
+
+  return parseFreeMindNode(rootNode);
+}
+```
+
+-----
+
+### \#\# Part 3: MindMeister (`.mind`) Parser Implementation
+
+This parser handles the JSON format from MindMeister.
+
+#### **Step 3.1: Create `src/utils/mindMeisterParser.js`**
+
+This file will be responsible for converting `.mind` JSON into our standard format.
+
+#### **Step 3.2: Add the Parser Code**
+
+MindMeister's JSON format is already hierarchical. We just need to map its property names to our own.
+
+```javascript
+// src/utils/mindMeisterParser.js
+
+/**
+ * Recursively parses a node from a MindMeister JSON object.
+ * @param {object} mindMeisterNode - The node from the original MindMeister JSON.
+ * @returns {object} A standardized Node object.
+ */
+function parseMindMeisterNode(mindMeisterNode) {
+  const node = {
+    id: mindMeisterNode.id,
+    text: mindMeisterNode.title || '',
+    children: [],
+    attributes: {
+      rank: mindMeisterNode.rank,
+      // Add any other attributes you want to preserve
+    },
+  };
+
+  // Recursively parse child nodes if they exist
+  if (mindMeisterNode.children && mindMeisterNode.children.length > 0) {
+    node.children = mindMeisterNode.children.map(parseMindMeisterNode);
+  }
+
+  return node;
+}
+
+/**
+ * Parses a MindMeister .mind file (as a JS object) into a standardized object.
+ * @param {object} mindJson - The JavaScript object parsed from the .mind file's JSON.
+ * @returns {object} The root Node object of the mind map.
+ */
+export function parseMindMeisterJson(mindJson) {
+  if (!mindJson || !mindJson.root || !mindJson.root.id) {
+    throw new Error('Invalid MindMeister file: Root node is missing or invalid.');
+  }
+  
+  return parseMindMeisterNode(mindJson.root);
+}
+```
+
+-----
+
 ### \#\# Part 4: Integrating All Parsers into `Viewer.js`
 
 Now, you'll update the `Viewer` component to use the correct parser based on the file extension. This acts as the "parser factory".
@@ -266,15 +266,15 @@ function Viewer() {
         let parsedData;
         
         // The "Parser Factory" logic
-        if (mapUrl.endsWith('.mm')) {
+        if (mapUrl.endsWith('.xmind')) {
+          const blob = await response.blob();
+          parsedData = await parseXmindFile(blob);
+        } else if (mapUrl.endsWith('.mm')) {
           const xmlString = await response.text();
           parsedData = parseFreeMindXml(xmlString);
         } else if (mapUrl.endsWith('.mind')) {
           const json = await response.json();
           parsedData = parseMindMeisterJson(json);
-        } else if (mapUrl.endsWith('.xmind')) {
-          const blob = await response.blob();
-          parsedData = await parseXmindFile(blob);
         } else {
           throw new Error('Unsupported file format. Please use .mm, .mind, or .xmind.');
         }

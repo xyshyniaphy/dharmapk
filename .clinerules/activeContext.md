@@ -8,7 +8,7 @@
 ## Recent Changes
 - The state management library has been decided as Recoil.
 - The core folder structure has been defined.
-- The initial data parsing logic for FreeMind (`.mm`) files has been outlined.
+- The initial data parsing logic for XMind (`.xmind`) files has been outlined.
 
 ## Active Decisions and Considerations
 - **Error Handling**: Defining a robust error handling strategy for file fetching and parsing.
@@ -38,7 +38,7 @@
 
 ## Known Issues and Limitations
 - **CORS**: Fetching files from external domains will fail without a CORS proxy.
-- **File Formats**: The initial implementation will only support the FreeMind (`.mm`) format. Other formats will require additional parsing logic.
+- **File Formats**: The initial implementation will only support the XMind (`.xmind`) format. Other formats will require additional parsing logic.
 - **Performance**: The performance of the application with very large mind maps is unknown and may require optimization.
 
 ## Evolution of Project Decisions
