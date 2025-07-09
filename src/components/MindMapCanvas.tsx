@@ -3,12 +3,14 @@ import { useAtomValue } from 'jotai';
 import * as d3 from 'd3';
 import { mindMapDataAtom } from '../state/mindMapStore';
 import type { Node as MindMapNode } from '../types';
+import NavigationPanel from './NavigationPanel';
 import './MindMapCanvas.css';
 
 function MindMapCanvas(): React.ReactElement {
   const svgRef = useRef<SVGSVGElement>(null);
   const mindMapData = useAtomValue(mindMapDataAtom);
   const [pinnedNode, setPinnedNode] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
+  const [hoveredPath, setHoveredPath] = useState<string[]>([]);
 
   const clearAllHighlights = useCallback(() => {
     const svg = d3.select(svgRef.current);
@@ -37,11 +39,14 @@ function MindMapCanvas(): React.ReactElement {
   const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
     if (pinnedNode || d.depth === 0) return;
     applyHighlight(d);
+    const path = d.ancestors().map((node: any) => node.data.text).reverse();
+    setHoveredPath(path.slice(0, -1));
   }, [pinnedNode, applyHighlight]);
 
   const handleMouseOut = useCallback(() => {
     if (pinnedNode) return;
     clearAllHighlights();
+    setHoveredPath([]);
   }, [pinnedNode, clearAllHighlights]);
 
   const handleNodeClick = useCallback((_event: MouseEvent, d: any) => {
@@ -68,14 +73,14 @@ function MindMapCanvas(): React.ReactElement {
       svg.on('contextmenu', handleContextMenu);
       svg.selectAll('*').remove(); // Clear previous render
 
-      const width = svgRef.current.clientWidth;
       const height = svgRef.current.clientHeight;
       
       const root = d3.hierarchy(mindMapData);
 
-      // Custom layout logic to ensure all leaf nodes are aligned to the right
-      const nodeHeight = 50; // Vertical spacing between nodes
-      const nodeWidth = 220; // Horizontal spacing between depth levels
+      // Custom layout logic with dynamic row height for leaf nodes
+      const baseNodeHeight = 40; // Base height for a single-line node
+      const lineHeight = 15;    // Additional height for each extra line
+      const nodeWidth = 220;    // Horizontal spacing between depth levels
 
       let maxDepth = 0;
       root.each(d => {
@@ -85,12 +90,28 @@ function MindMapCanvas(): React.ReactElement {
       });
 
       const leaves = root.leaves();
-      const layoutHeight = (leaves.length - 1) * nodeHeight;
+      let currentX = 0;
+
+      leaves.forEach(leaf => {
+        const numLines = leaf.data.text.split('\n').length;
+        const nodeHeight = baseNodeHeight + (numLines - 1) * lineHeight;
+        
+        // Assign position, centering the node within its allocated space
+        (leaf as any).x = currentX + nodeHeight / 2;
+        (leaf as any).y = maxDepth * nodeWidth;
+        
+        // Move the starting point for the next node
+        currentX += nodeHeight;
+      });
+
+      const layoutHeight = currentX;
       const yOffset = (height - layoutHeight) / 2;
 
-      leaves.forEach((leaf, i) => {
-        (leaf as any).x = yOffset + i * nodeHeight;
-        (leaf as any).y = maxDepth * nodeWidth;
+      // Apply the vertical offset to all nodes to center the layout
+      root.each(d => {
+        if (!isNaN((d as any).x)) {
+          (d as any).x += yOffset;
+        }
       });
 
       root.eachAfter(node => {
@@ -149,7 +170,7 @@ function MindMapCanvas(): React.ReactElement {
         });
 
       svg.call(zoom);
-      svg.call(zoom.transform, d3.zoomIdentity.translate(100, 0));
+      svg.call(zoom.transform, d3.zoomIdentity.translate(100, yOffset > 0 ? yOffset : 0));
     }
   }, [mindMapData, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick, applyHighlight, clearAllHighlights]);
 
@@ -159,6 +180,7 @@ function MindMapCanvas(): React.ReactElement {
 
   return (
     <div className="mind-map-container">
+      <NavigationPanel path={hoveredPath} />
       <svg ref={svgRef} width="100%" height="100%"></svg>
     </div>
   );

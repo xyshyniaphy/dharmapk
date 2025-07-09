@@ -558,3 +558,107 @@ const zoom = d3.zoom()
   });
 
 svg.call(zoom);
+
+-----
+
+### **Part 7: Navigation Panel**
+
+This feature displays the path from the root to the currently hovered node.
+
+#### **Step 1: Create `NavigationPanel.tsx`**
+
+This component renders the path.
+
+```typescript
+// src/components/NavigationPanel.tsx
+import React from 'react';
+import './NavigationPanel.css';
+
+interface NavigationPanelProps {
+  path: string[];
+}
+
+const NavigationPanel: React.FC<NavigationPanelProps> = ({ path }) => {
+  if (path.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="navigation-panel">
+      <ul>
+        {path.map((nodeName, index) => (
+          <li key={index} style={{ paddingLeft: `${index * 20}px` }}>
+            {nodeName}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default NavigationPanel;
+```
+
+#### **Step 2: Create `NavigationPanel.css`**
+
+This file styles the navigation panel.
+
+```css
+/* src/components/NavigationPanel.css */
+.navigation-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.navigation-panel ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navigation-panel li {
+  font-family: sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+}
+```
+
+#### **Step 3: Integrate into `MindMapCanvas.tsx`**
+
+Update the main canvas component to manage and display the navigation panel.
+
+```typescript
+// In MindMapCanvas.tsx
+
+// 1. Add state for the hovered path
+const [hoveredPath, setHoveredPath] = useState<string[]>([]);
+
+// 2. Update mouse event handlers
+const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
+  if (pinnedNode || d.depth === 0) return;
+  applyHighlight(d);
+  const path = d.ancestors().map((node: any) => node.data.text).reverse();
+  setHoveredPath(path.slice(0, -1)); // Exclude the hovered node itself
+}, [pinnedNode, applyHighlight]);
+
+const handleMouseOut = useCallback(() => {
+  if (pinnedNode) return;
+  clearAllHighlights();
+  setHoveredPath([]);
+}, [pinnedNode, clearAllHighlights]);
+
+// 3. Render the component
+return (
+  <div className="mind-map-container">
+    <NavigationPanel path={hoveredPath} />
+    <svg ref={svgRef} width="100%" height="100%"></svg>
+  </div>
+);
+```

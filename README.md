@@ -243,6 +243,7 @@ A factory pattern in the `Viewer` component determines which parser to use based
 - The core data flow and component structure have been planned.
 - All parsers for `.xmind`, `.mm`, and `.mind` files are implemented.
 - Interactive features like hover highlighting, click-to-pin, and zoom/pan are fully functional.
+- A navigation panel that displays the path from the root to the hovered node's parent.
 
 **What's Left to Build:**
 - Styling improvements.
@@ -260,6 +261,7 @@ A factory pattern in the `Viewer` component determines which parser to use based
 - 核心数据流和组件结构已规划好。
 - `.xmind`、`.mm` 和 `.mind` 文件的所有解析器均已实现。
 - 悬停高亮、点击固定和缩放/平移等交互功能已完全实现。
+- 一个导航面板，显示从根节点到悬停节点父级的路径。
 
 **待构建的内容:**
 - 样式改进。
