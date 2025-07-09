@@ -1,20 +1,18 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './index.css'
-
+import { RecoilRoot } from 'recoil';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Viewer from './components/Viewer.tsx';
+import './index.css';
 
 function App() {
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold underline">    Hello world!  </h1>
-      <div className="p-4 border border-gray-700 rounded-lg">
-       
-      </div>
-
-    </div>
-  )
+    <RecoilRoot>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Viewer />} />
+        </Routes>
+      </Router>
+    </RecoilRoot>
+  );
 }
 
-export default App
+export default App;
