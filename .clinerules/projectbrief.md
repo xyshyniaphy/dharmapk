@@ -28,7 +28,8 @@ The application is a Single Page Application (SPA) that functions as a mind map 
 - Do not delete old code, but comment the old code out, and make a comment, with modify date.
 - do not generate or modify regex expression
 - do not put "\n" in string to get newline in , define a variable as "\n" and use string concat with the variable to generate newline in string
-
+- do not run command "npm run dev
+- do not run command "open" to open url link
 
 
 ----------------------------
