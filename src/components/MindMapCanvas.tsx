@@ -75,7 +75,7 @@ function MindMapCanvas(): React.ReactElement {
       const treeLayout = d3.tree<MindMapNode>().size([height, width - 200]);
       treeLayout(root);
 
-      const g = svg.append('g').attr('transform', 'translate(100,0)');
+      const g = svg.append('g');
 
       // Links
       g.selectAll('.link')
@@ -107,6 +107,15 @@ function MindMapCanvas(): React.ReactElement {
         .attr('x', d => d.children ? -13 : 13)
         .style('text-anchor', d => d.children ? 'end' : 'start')
         .text(d => d.data.text);
+
+      const zoom = d3.zoom<SVGSVGElement, unknown>()
+        .scaleExtent([0.1, 3])
+        .on('zoom', (event) => {
+          g.attr('transform', event.transform);
+        });
+
+      svg.call(zoom);
+      svg.call(zoom.transform, d3.zoomIdentity.translate(100, 0));
     }
   }, [mindMapData, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick, applyHighlight, clearAllHighlights]);
 
