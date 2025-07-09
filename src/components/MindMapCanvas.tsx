@@ -34,7 +34,7 @@ function MindMapCanvas(): React.ReactElement {
       .classed('dimmed', (link: any) => !highlightedNodes.has(link.source) || !highlightedNodes.has(link.target));
   }, []);
 
-  const handleMouseOver = useCallback((event: MouseEvent, d: any) => {
+  const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
     if (pinnedNode || d.depth === 0) return;
     applyHighlight(d);
   }, [pinnedNode, applyHighlight]);
@@ -44,7 +44,7 @@ function MindMapCanvas(): React.ReactElement {
     clearAllHighlights();
   }, [pinnedNode, clearAllHighlights]);
 
-  const handleNodeClick = useCallback((event: MouseEvent, d: any) => {
+  const handleNodeClick = useCallback((_event: MouseEvent, d: any) => {
     if (d.depth === 0) return;
 
     if (pinnedNode === d) {
