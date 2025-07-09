@@ -72,8 +72,33 @@ function MindMapCanvas(): React.ReactElement {
       const height = svgRef.current.clientHeight;
       
       const root = d3.hierarchy(mindMapData);
-      const treeLayout = d3.tree<MindMapNode>().size([height, width - 200]);
-      treeLayout(root);
+
+      // Custom layout logic to ensure all leaf nodes are aligned to the right
+      const nodeHeight = 50; // Vertical spacing between nodes
+      const nodeWidth = 220; // Horizontal spacing between depth levels
+
+      let maxDepth = 0;
+      root.each(d => {
+        if (d.depth > maxDepth) {
+          maxDepth = d.depth;
+        }
+      });
+
+      const leaves = root.leaves();
+      const layoutHeight = (leaves.length - 1) * nodeHeight;
+      const yOffset = (height - layoutHeight) / 2;
+
+      leaves.forEach((leaf, i) => {
+        (leaf as any).x = yOffset + i * nodeHeight;
+        (leaf as any).y = maxDepth * nodeWidth;
+      });
+
+      root.eachAfter(node => {
+        if (node.children) {
+          (node as any).x = d3.mean(node.children, d => (d as any).x);
+          (node as any).y = node.depth * nodeWidth;
+        }
+      });
 
       const g = svg.append('g');
 
@@ -94,7 +119,7 @@ function MindMapCanvas(): React.ReactElement {
         .enter()
         .append('g')
         .attr('class', d => `node ${d.children ? 'node--internal' : 'node--leaf'}`)
-        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('transform', d => `translate(${(d as any).y},${(d as any).x})`)
         .on('mouseover', handleMouseOver)
         .on('mouseout', handleMouseOut)
         .on('click', handleNodeClick)
@@ -103,10 +128,19 @@ function MindMapCanvas(): React.ReactElement {
       node.append('circle').attr('r', 10);
 
       node.append('text')
-        .attr('dy', '.35em')
         .attr('x', d => d.children ? -13 : 13)
         .style('text-anchor', d => d.children ? 'end' : 'start')
-        .text(d => d.data.text);
+        .each(function(d) {
+          const text = d3.select(this);
+          const lines = d.data.text.split('\n');
+          text.text(null);
+          for (let i = 0; i < lines.length; i++) {
+            text.append('tspan')
+              .attr('x', d.children ? -13 : 13)
+              .attr('dy', i === 0 ? '0.35em' : '1.2em')
+              .text(lines[i]);
+          }
+        });
 
       const zoom = d3.zoom<SVGSVGElement, unknown>()
         .scaleExtent([0.1, 3])
