@@ -307,6 +307,7 @@ By strictly following these guidelines, you'll ensure smooth transitions between
 
 ## MCP usage
 - You will use mcp tool "Context7" to get latest document, when implement functions related to "React", "D3.js", "Tailwind CSS", "Recoil".   You should use best practices to implement the function. You should check the correnct version of libraries first.
+- You must refer to `Jotai_Readme.md` when writing any state management code to ensure it is up-to-date with the latest patterns.
 
 ## Development Setup
 - The project is set up as a standard Create React App project.
