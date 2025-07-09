@@ -7,7 +7,7 @@ import type { Node } from '../types';
  */
 function parseFreeMindNode(xmlNode: Element): Node {
   const node: Node = {
-    id: xmlNode.getAttribute('ID'),
+    id: xmlNode.getAttribute('ID') || '',
     text: xmlNode.getAttribute('TEXT') || '',
     children: [],
     attributes: {

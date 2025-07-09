@@ -1,0 +1,31 @@
+.mind-map-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node.highlighted circle {
+  stroke-width: 3px;
+  stroke: #3182ce; /* Example highlight color */
+}
+
+.link.highlighted {
+  stroke-width: 4px;
+  stroke: #3182ce; /* Match the node's border color */
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}

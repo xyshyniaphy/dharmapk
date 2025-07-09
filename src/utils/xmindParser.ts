@@ -11,8 +11,8 @@ function parseXMindTopic(topicElement: Element): Node {
   const childrenContainer = topicElement.querySelector(':scope > topics');
   
   const node: Node = {
-    id: topicElement.getAttribute('id'),
-    text: titleElement ? titleElement.textContent : '',
+    id: topicElement.getAttribute('id') || '',
+    text: titleElement ? titleElement.textContent || '' : '',
     children: [],
     attributes: {
       // You can extract more attributes if needed

@@ -1,6 +1,6 @@
 export interface Node {
-  id: string | null;
-  text: string | null;
-  children: Node[];
-  attributes: any;
+  id: string;
+  text: string;
+  children?: Node[];
+  attributes?: { [key: string]: any };
 }

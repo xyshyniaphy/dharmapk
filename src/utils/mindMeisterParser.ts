@@ -3,8 +3,8 @@ import type { Node } from '../types';
 interface MindMeisterNode {
   id: string;
   title: string;
-  children: MindMeisterNode[];
-  rank: number;
+  children?: MindMeisterNode[];
+  rank?: number;
 }
 
 /**
@@ -19,7 +19,6 @@ function parseMindMeisterNode(mindMeisterNode: MindMeisterNode): Node {
     children: [],
     attributes: {
       rank: mindMeisterNode.rank,
-      // Add any other attributes you want to preserve
     },
   };
 
