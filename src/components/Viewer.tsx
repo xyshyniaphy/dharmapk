@@ -9,6 +9,7 @@ import { parseMindMeisterJson } from '../utils/mindMeisterParser';
 import { parseXmindFile } from '../utils/xmindParser';
 
 import MindMapCanvas from './MindMapCanvas';
+import LoadingSpinner from './LoadingSpinner';
 import type { Node } from '../types';
 
 function Viewer(): React.ReactElement {
@@ -76,7 +77,7 @@ function Viewer(): React.ReactElement {
     fetchData();
   }, [location, setMindMapData]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div style={{ padding: '20px', color: 'red', fontFamily: 'sans-serif' }}><strong>Error:</strong> {error}</div>;
 
   const searchParams = new URLSearchParams(location.search);
