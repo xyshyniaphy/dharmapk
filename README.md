@@ -28,7 +28,7 @@ The application is a Single Page Application (SPA).
 2.  The application fetches, parses, and renders the data.
 3.  The user can interact with the mind map (pan, zoom, hover).
 4.  Rendering is handled by D3.js.
-5.  State is managed globally using Recoil.
+5.  State is managed globally using Jotai.
 
 **Core Requirements:**
 - Visualize hierarchical data.
@@ -53,7 +53,7 @@ The application is a Single Page Application (SPA).
 2.  应用程序获取、解析和渲染数据。
 3.  用户可以与思维导图进行交互（平移、缩放、悬停）。
 4.  渲染由 D3.js 处理。
-5.  状态使用 Recoil 进行全局管理。
+5.  状态使用 Jotai 进行全局管理。
 
 **核心要求:**
 - 可视化层次结构数据。
@@ -85,7 +85,7 @@ The application is a Single Page Application (SPA).
 ### English
 
 - **React**: v18+ with TypeScript
-- **Recoil**: For state management
+- **Jotai**: For state management
 - **React Router**: For client-side routing
 - **D3.js**: v7 for data visualization and SVG rendering
 - **Tailwind CSS**: For utility-first styling
@@ -95,7 +95,7 @@ The application is a Single Page Application (SPA).
 ### 中文
 
 - **React**: v18+ with TypeScript
-- **Recoil**: 用于状态管理
+- **Jotai**: 用于状态管理
 - **React Router**: 用于客户端路由
 - **D3.js**: v7 用于数据可视化和 SVG 渲染
 - **Tailwind CSS**: 用于功能优先的样式设计
@@ -115,7 +115,7 @@ The application is a Single Page Application (SPA) with a component-based archit
 - **Component-Based Architecture**: The UI is broken down into reusable React components.
 - **Hooks**: Custom hooks encapsulate and reuse logic.
 - **Data-Driven Visualization**: The D3.js implementation is a direct representation of the application's state.
-- **Global State Management**: A central Recoil store manages the application's global state.
+- **Global State Management**: A central Jotai store manages the application's global state.
 
 ### 中文
 
@@ -126,7 +126,7 @@ The application is a Single Page Application (SPA) with a component-based archit
 - **基于组件的架构**: 用户界面被分解为可重用的 React 组件。
 - **Hooks**: 自定义 Hooks 用于封装和重用逻辑。
 - **数据驱动的可视化**: D3.js 的实现是应用程序状态的直接表示。
-- **全局状态管理**: 中央 Recoil 存储用于管理应用程序的全局状态。
+- **全局状态管理**: 中央 Jotai 存储用于管理应用程序的全局状态。
 
 ---
 
@@ -164,7 +164,7 @@ The application supports parsing multiple mind map formats. The goal is to conve
 
 - **FreeMind (.mm)**: Parsed using a standard XML parser (`DOMParser`).
 - **MindMeister (.mind)**: Parsed by mapping the hierarchical JSON to the standard `Node` structure.
-- **XMind (.xmind)**: Parsed by first unzipping the file to access `content.xml`, then parsing the XML. The `JSZip` library is used for this.
+- **XMind (.xmind)**: Modern `.xmind` files are parsed by unzipping the file, reading `metadata.json` to check the version, and then parsing `content.json`. Older files fall back to parsing `content.xml`. The `JSZip` library is used for unzipping.
 
 A factory pattern in the `Viewer` component determines which parser to use based on the file extension.
 
@@ -174,7 +174,7 @@ A factory pattern in the `Viewer` component determines which parser to use based
 
 - **FreeMind (.mm)**: 使用标准 XML 解析器 (`DOMParser`) 进行解析。
 - **MindMeister (.mind)**: 通过将分层 JSON 映射到标准 `Node` 结构进行解析。
-- **XMind (.xmind)**: 首先解压缩文件以访问 `content.xml`，然后解析 XML。`JSZip` 库用于此目的。
+- **XMind (.xmind)**: 现代的 `.xmind` 文件通过解压缩文件，读取 `metadata.json` 来检查版本，然后解析 `content.json` 来进行解析。旧文件则回退到解析 `content.xml`。`JSZip` 库用于解压缩。
 
 `Viewer` 组件中的工厂模式根据文件扩展名确定使用哪个解析器。
 

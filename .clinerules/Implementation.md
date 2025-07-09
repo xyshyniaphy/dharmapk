@@ -19,7 +19,7 @@ const Node = {
 
 ### \#\# Part 1: XMind (`.xmind`) Parser Implementation
 
-This is the most complex parser because it requires unzipping the file first.
+This is the most complex parser because it requires unzipping the file first. Modern `.xmind` files use a JSON-based structure, while older ones use XML. The parser handles both.
 
 #### **Step 1.1: Install JSZip**
 
@@ -29,39 +29,37 @@ You'll need a library to handle the `.zip` archive in the browser. JSZip is perf
 npm install jszip
 ```
 
-#### **Step 1.2: Create `src/utils/xmindParser.js`**
+#### **Step 1.2: Create `src/utils/xmindParser.ts`**
 
 This file will contain all the logic for fetching, unzipping, and parsing the `.xmind` file.
 
 #### **Step 1.3: Add the Parser Code**
 
-The process involves finding `content.xml` within the zip archive and then parsing it.
+The process involves checking for `metadata.json` to determine the file version. If it's version 2, it parses `content.json`. Otherwise, it falls back to parsing `content.xml`.
 
-```javascript
-// src/utils/xmindParser.js
+```typescript
+// src/utils/xmindParser.ts
 import JSZip from 'jszip';
+import type { Node } from '../types';
 
-/**
- * Recursively parses a <topic> element from XMind's content.xml.
- * @param {Element} topicElement - The XML <topic> element.
- * @returns {object} A standardized Node object.
- */
-function parseXMindTopic(topicElement) {
-  const titleElement = topicElement.querySelector(':scope > title');
-  const childrenContainer = topicElement.querySelector(':scope > topics');
-  
-  const node = {
-    id: topicElement.getAttribute('id'),
-    text: titleElement ? titleElement.textContent : '',
+interface XmindJsonNode {
+  id: string;
+  title: string;
+  children?: {
+    attached?: XmindJsonNode[];
+  };
+}
+
+function parseXmindJsonNode(xmindNode: XmindJsonNode): Node {
+  const node: Node = {
+    id: xmindNode.id,
+    text: xmindNode.title || '',
     children: [],
-    attributes: {
-      // You can extract more attributes if needed
-    },
+    attributes: {},
   };
 
-  if (childrenContainer) {
-    const childTopics = Array.from(childrenContainer.querySelectorAll(':scope > topic'));
-    node.children = childTopics.map(parseXMindTopic);
+  if (xmindNode.children && xmindNode.children.attached) {
+    node.children = xmindNode.children.attached.map(parseXmindJsonNode);
   }
 
   return node;
@@ -73,25 +71,75 @@ function parseXMindTopic(topicElement) {
  * @param {Blob} blob - The .xmind file fetched as a Blob.
  * @returns {Promise<object>} A promise that resolves to the root Node object.
  */
-export async function parseXmindFile(blob) {
+export async function parseXmindFile(blob: Blob): Promise<Node> {
   const zip = await JSZip.loadAsync(blob);
+
+  const metadataFile = zip.file('metadata.json');
+  if (!metadataFile) {
+    // Fallback to old XML format
+    return parseXmindXml(zip);
+  }
+
+  const metadataString = await metadataFile.async('string');
+  const metadata = JSON.parse(metadataString);
+
+  if (metadata.dataStructureVersion === '2') {
+    const contentFile = zip.file('content.json');
+    if (!contentFile) {
+      throw new Error('Invalid XMind file: "content.json" not found for data structure version 2.');
+    }
+    const contentString = await contentFile.async('string');
+    const content = JSON.parse(contentString);
+    
+    // Assuming the first sheet is the one we want
+    const sheet = content[0];
+    if (!sheet || !sheet.rootTopic) {
+      throw new Error('Invalid XMind content.json: No root topic found in the first sheet.');
+    }
+    
+    return parseXmindJsonNode(sheet.rootTopic);
+
+  } else {
+    // Fallback or error for other versions
+    return parseXmindXml(zip);
+  }
+}
+
+async function parseXmindXml(zip: JSZip): Promise<Node> {
+    const contentFile = zip.file('content.xml');
+    if (!contentFile) {
+      throw new Error('Invalid XMind file: "content.xml" not found in the archive.');
+    }
   
-  const contentFile = zip.file('content.xml');
-  if (!contentFile) {
-    throw new Error('Invalid XMind file: "content.xml" not found in the archive.');
-  }
+    const xmlString = await contentFile.async('string');
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+  
+    const rootTopic = xmlDoc.querySelector('xmap-content > sheet > topic');
+    if (!rootTopic) {
+      throw new Error('Invalid XMind file: Could not find the root topic in "content.xml".');
+    }
+  
+    return parseXMindTopicXml(rootTopic);
+}
 
-  const xmlString = await contentFile.async('string');
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-
-  // XMind files have a root <xmap-content> with a <sheet> and then the root <topic>
-  const rootTopic = xmlDoc.querySelector('xmap-content > sheet > topic');
-  if (!rootTopic) {
-    throw new Error('Invalid XMind file: Could not find the root topic in "content.xml".');
-  }
-
-  return parseXMindTopic(rootTopic);
+function parseXMindTopicXml(topicElement: Element): Node {
+    const titleElement = topicElement.querySelector(':scope > title');
+    const childrenContainer = topicElement.querySelector(':scope > topics');
+    
+    const node: Node = {
+      id: topicElement.getAttribute('id') || '',
+      text: titleElement ? titleElement.textContent || '' : '',
+      children: [],
+      attributes: {},
+    };
+  
+    if (childrenContainer) {
+      const childTopics = Array.from(childrenContainer.querySelectorAll(':scope > topic'));
+      node.children = childTopics.map(parseXMindTopicXml);
+    }
+  
+    return node;
 }
 ```
 
