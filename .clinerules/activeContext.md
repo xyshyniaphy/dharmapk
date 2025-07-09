@@ -18,7 +18,7 @@
 - The use of a dedicated hook (`useMindMapData` or similar logic within a component) to encapsulate data fetching and parsing logic is a key pattern.
 - The separation of concerns between data fetching/management and rendering (D3.js) is crucial for maintainability.
 
-
+------------------
 
 # Progress: Interactive Mind Map UI
 
