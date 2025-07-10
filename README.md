@@ -224,6 +224,26 @@ All settings are saved to the browser's LocalStorage and persist between session
 
 ---
 
+## 9. Interaction Logic (交互逻辑)
+
+### English
+
+The application features a sophisticated interaction model to enhance usability.
+
+-   **Hovering an Internal Node**: Highlights the node's ancestors and descendants to show the complete sub-tree and its lineage.
+-   **Hovering a Leaf Node**: Bolds the node's text, highlights the path to the root, and keeps its siblings visible, while dimming all other elements. This focuses on the node's specific context.
+-   **Click to Pin**: A left-click on any node "pins" its highlighted state, disabling hover effects until it is unpinned by clicking it again or by right-clicking anywhere on the canvas.
+
+### 中文
+
+该应用程序具有复杂的交互模型以增强可用性。
+
+-   **悬停内部节点**: 突出显示节点的祖先和后代，以显示完整的子树及其谱系。
+-   **悬停叶子节点**: 加粗节点文本，突出显示到根节点的路径，并保持其兄弟节点可见，同时使所有其他元素变暗。这有助于关注节点的特定上下文。
+-   **点击固定**: 在任何节点上单击鼠标左键可“固定”其高亮状态，禁用悬停效果，直到再次单击它或在画布上的任何位置单击鼠标右键取消固定。
+
+---
+
 ## 9. Component and Styling Guide (组件与样式指南)
 
 ### English

@@ -41,8 +41,34 @@ function MindMapCanvas(): React.ReactElement {
   }, []);
 
   const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
-    if (pinnedNode || d.depth === 0) return;
-    applyHighlight(d);
+    if (pinnedNode) return;
+
+    if (!d.children) { // It's a leaf node
+        const svg = d3.select(svgRef.current);
+        
+        // Get ancestors (path to root) and siblings
+        const ancestors = d.ancestors();
+        const ancestorSet = new Set(ancestors);
+        const parent = d.parent;
+        const siblings = parent ? parent.children || [] : [];
+
+        // Determine which nodes should be visible (ancestors + siblings)
+        const visibleNodes = new Set([...ancestors, ...siblings]);
+
+        // Apply styles to all nodes
+        svg.selectAll('.node')
+            .classed('highlighted', (node: any) => node === d) // Bold text for hovered node
+            .classed('dimmed', (node: any) => !visibleNodes.has(node));
+
+        // Apply styles to all links
+        svg.selectAll('.link')
+            .classed('highlighted', (link: any) => ancestorSet.has(link.source) && ancestorSet.has(link.target))
+            .classed('dimmed', (link: any) => !(ancestorSet.has(link.source) && ancestorSet.has(link.target)));
+
+    } else { // It's an internal node
+        if (d.depth === 0) return;
+        applyHighlight(d);
+    }
     
     const parent = d.parent;
     if (parent) {

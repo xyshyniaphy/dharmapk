@@ -706,3 +706,34 @@ return (
   </div>
 );
 ```
+
+-----
+
+### **Part 8: Hover and Highlighting Logic**
+
+This section defines the specific highlighting behavior for user interactions. These rules must be maintained in all future implementations.
+
+#### **1.0 Hovering an Internal Node**
+- **Action**: When a user hovers over an internal node (a node with children).
+- **Behavior**:
+    - All direct ancestors of the hovered node (the path to the root) are highlighted.
+    - All descendants of the hovered node are highlighted.
+    - All other nodes and links are dimmed.
+- **Purpose**: To show the complete sub-tree and its lineage.
+
+#### **2.0 Hovering a Leaf Node**
+- **Action**: When a user hovers over a leaf node (a node with no children).
+- **Behavior**:
+    - The text of the hovered leaf node becomes bold.
+    - The direct ancestors of the leaf node (the path to the root) remain fully visible.
+    - The links connecting the ancestors are highlighted.
+    - All sibling nodes of the hovered leaf node remain fully visible.
+    - All other nodes and links in the mind map are dimmed.
+- **Purpose**: To focus on a specific leaf node, its immediate context (siblings), and its direct path to the root, while de-emphasizing the rest of the map.
+
+#### **3.0 Pinned Node**
+- **Action**: When a node is "pinned" via a click.
+- **Behavior**:
+    - All hover effects are disabled.
+    - The highlighting for the pinned node and its related path will persist until it is unpinned.
+- **Purpose**: To allow the user to lock a specific view for closer examination.

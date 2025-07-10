@@ -10,14 +10,13 @@
   stroke-width: 3px;
 }
 
-.node.highlighted circle {
-  stroke-width: 3px;
-  stroke: #3182ce; /* Example highlight color */
+.node.highlighted text {
+  font-weight: bold;
 }
 
 .link.highlighted {
   stroke-width: 4px;
-  stroke: #3182ce; /* Match the node's border color */
+  stroke: #3182ce;
 }
 
 .node text {
