@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { mindMapDataAtom } from '../state/mindMapStore';
 import { settingsAtom } from '../state/settingsStore';
 import type { Node as MindMapNode } from '../types';
-import NavigationPanel from './NavigationPanel';
+import PartitionNav from './PartitionNav';
 import './MindMapCanvas.css';
 
 function MindMapCanvas(): React.ReactElement {
@@ -12,9 +12,7 @@ function MindMapCanvas(): React.ReactElement {
   const mindMapData = useAtomValue(mindMapDataAtom);
   const settings = useAtomValue(settingsAtom);
   const [pinnedNode, setPinnedNode] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
-  const [hoveredPath, setHoveredPath] = useState<string[]>([]);
-  const [hoveredSiblings, setHoveredSiblings] = useState<string[]>([]);
-  const [hoveredParent, setHoveredParent] = useState<string | null>(null);
+  const [hoveredNodeData, setHoveredNodeData] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
 
   const clearAllHighlights = useCallback(() => {
     const svg = d3.select(svgRef.current);
@@ -44,6 +42,7 @@ function MindMapCanvas(): React.ReactElement {
     if (pinnedNode) return;
 
     if (!d.children) { // It's a leaf node
+        console.log(d.ancestors().length);
         const svg = d3.select(svgRef.current);
         
         // Get ancestors (path to root) and siblings
@@ -71,38 +70,13 @@ function MindMapCanvas(): React.ReactElement {
     }
     
     const parent = d.parent;
-    if (parent) {
-        const grandParent = parent.parent;
-        if (grandParent) {
-            const grandParentPath = grandParent.ancestors().map((node: any) => node.data.text).reverse();
-            setHoveredPath(grandParentPath);
-            const siblings = grandParent.children?.map((node: any) => node.data.text) || [];
-            setHoveredSiblings(siblings);
-        } else {
-            // Parent is a child of the root
-            setHoveredPath([]);
-            const root = d.ancestors().find((node: any) => node.depth === 0);
-            if (root) {
-                const siblings = root.children?.map((node: any) => node.data.text) || [];
-                setHoveredSiblings(siblings);
-            } else {
-                setHoveredSiblings([]);
-            }
-        }
-        setHoveredParent(parent.data.text);
-    } else {
-      setHoveredPath([]);
-      setHoveredSiblings([]);
-      setHoveredParent(null);
-    }
+    setHoveredNodeData(d);
   }, [pinnedNode, applyHighlight]);
 
   const handleMouseOut = useCallback(() => {
     if (pinnedNode) return;
     clearAllHighlights();
-    setHoveredPath([]);
-    setHoveredSiblings([]);
-    setHoveredParent(null);
+    setHoveredNodeData(null);
   }, [pinnedNode, clearAllHighlights]);
 
   const handleNodeClick = useCallback((_event: MouseEvent, d: any) => {
@@ -285,7 +259,7 @@ function MindMapCanvas(): React.ReactElement {
 
   return (
     <div className="mind-map-container">
-      <NavigationPanel path={hoveredPath} siblings={hoveredSiblings} parentNodeName={hoveredParent} />
+      {mindMapData && <PartitionNav mindMapData={mindMapData} hoveredNodeData={hoveredNodeData} />}
       <svg ref={svgRef} width="100%" height="100%"></svg>
     </div>
   );
