@@ -239,6 +239,7 @@ The application features a sophisticated interaction model to enhance usability.
 -   **Hovering an Internal Node**: Highlights the node's ancestors and descendants to show the complete sub-tree and its lineage.
 -   **Hovering a Leaf Node**: Bolds the node's text, highlights the path to the root, and keeps its siblings visible, while dimming all other elements. This focuses on the node's specific context.
 -   **Click to Pin**: A left-click on any node "pins" its highlighted state, disabling hover effects until it is unpinned by clicking it again or by right-clicking anywhere on the canvas.
+-   **Partition Navigation Panel**: A hierarchical overview of the mind map is displayed using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the currently hovered node in the main canvas. The original node order from the data file is preserved.
 
 ### 中文
 
@@ -247,6 +248,7 @@ The application features a sophisticated interaction model to enhance usability.
 -   **悬停内部节点**: 突出显示节点的祖先和后代，以显示完整的子树及其谱系。
 -   **悬停叶子节点**: 加粗节点文本，突出显示到根节点的路径，并保持其兄弟节点可见，同时使所有其他元素变暗。这有助于关注节点的特定上下文。
 -   **点击固定**: 在任何节点上单击鼠标左键可“固定”其高亮状态，禁用悬停效果，直到再次单击它或在画布上的任何位置单击鼠标右键取消固定。
+-   **分区导航面板**: 使用 D3 分区布局显示思维导图的层次结构概览。它渲染所有非叶子节点，并高亮显示到悬停节点的路径。保留了数据文件中的原始节点顺序。
 
 ---
 
@@ -291,7 +293,7 @@ The application features a sophisticated interaction model to enhance usability.
 - The core data flow and component structure have been planned.
 - All parsers for `.xmind`, `.mm`, and `.mind` files are implemented.
 - Interactive features like hover highlighting, click-to-pin, and zoom/pan are fully functional.
-- A navigation panel that displays the path to the parent of the hovered node, and lists all of the parent's siblings.
+- A navigation panel that displays a hierarchical overview of the mind map using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the hovered node. The original node order from the data file is preserved.
 
 **What's Left to Build:**
 - Styling improvements.
@@ -309,7 +311,7 @@ The application features a sophisticated interaction model to enhance usability.
 - 核心数据流和组件结构已规划好。
 - `.xmind`、`.mm` 和 `.mind` 文件的所有解析器均已实现。
 - 悬停高亮、点击固定和缩放/平移等交互功能已完全实现。
-- 一个导航面板，显示到悬停节点父级的路径，并列出父级的所有同级节点。
+- 一个导航面板，使用 D3 分区布局显示思维导图的层次结构概览。它渲染所有非叶子节点，并高亮显示到悬停节点的路径。保留了数据文件中的原始节点顺序。
 
 **待构建的内容:**
 - 样式改进。

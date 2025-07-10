@@ -561,147 +561,146 @@ svg.call(zoom);
 
 -----
 
-### **Part 7: Navigation Panel**
+### **Part 7: Partition Navigation Panel**
 
-This feature displays the path from the root to the parent of the currently hovered node, and also displays the siblings of the parent node.
+This feature displays a hierarchical overview of the mind map using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the currently hovered node in the main canvas.
 
-#### **Step 1: Create `NavigationPanel.tsx`**
+#### **Step 1: Create `PartitionNav.tsx`**
 
-This component renders the path and the siblings.
+This component encapsulates the D3 partition layout logic. It preserves the original node order from the data file by not applying any sorting.
 
 ```typescript
-// src/components/NavigationPanel.tsx
-import React from 'react';
-import './NavigationPanel.css';
+// src/components/PartitionNav.tsx
+import React, { useRef, useEffect } from 'react';
+import * as d3 from 'd3';
+import type { Node as MindMapNode } from '../types';
+import './PartitionNav.css';
 
-interface NavigationPanelProps {
-  path: string[];
-  siblings: string[];
-  parentNodeName: string | null;
+interface PartitionNavProps {
+  mindMapData: MindMapNode;
+  hoveredNodeData: d3.HierarchyPointNode<MindMapNode> | null;
 }
 
-const NavigationPanel: React.FC<NavigationPanelProps> = ({ path, siblings, parentNodeName }) => {
-  if (path.length === 0 && siblings.length === 0) {
-    return null;
-  }
+const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeData }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    if (mindMapData && svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.selectAll('*').remove();
+
+      const width = 300;
+      const height = svg.node()?.clientHeight || 400;
+      const margin = { top: 10, right: 10, bottom: 10, left: 10 };
+
+      const partitionLayout = d3.partition<MindMapNode>()
+        .size([height - margin.top - margin.bottom, width - margin.left - margin.right])
+        .padding(1);
+
+      const root = partitionLayout(d3.hierarchy<MindMapNode>(mindMapData)
+        .sum(d => (!d.children || d.children.length === 0) ? 1 : 0)); // Correctly count leaf nodes
+
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Filter for non-leaf nodes as per the original requirement
+      const nodes = root.descendants().filter(d => d.children && d.children.length > 0) as d3.HierarchyRectangularNode<MindMapNode>[];
+
+      const node = g.selectAll('g')
+        .data(nodes)
+        .join('g')
+        .attr('transform', d => `translate(${d.y0},${d.x0})`);
+
+      node.append('rect')
+        .attr('width', d => d.y1 - d.y0)
+        .attr('height', d => d.x1 - d.x0)
+        .attr('fill', 'none')
+        .attr('stroke', '#ccc');
+
+      // Add a title for tooltips on hover
+      node.append('title')
+        .text(d => `${d.ancestors().map(n => n.data.text).reverse().join(" / ")}\nValue: ${d.value}`);
+
+      // Add labels, filtering for cells that are large enough
+      node.filter(d => (d.y1 - d.y0) > 40) // Only show text if the cell is wide enough
+        .append('text')
+        .attr('x', 5)
+        .attr('y', 15)
+        .text(d => d.data.text)
+        .attr('fill', 'black')
+        .style('font-size', '12px');
+
+      if (hoveredNodeData) {
+        const hoveredAncestors = new Set(hoveredNodeData.ancestors().map(n => n.data.id));
+        node.selectAll<SVGRectElement, d3.HierarchyRectangularNode<MindMapNode>>('rect')
+          .attr('fill', d => hoveredAncestors.has(d.data.id) ? 'rgba(49, 130, 206, 0.3)' : 'none');
+      }
+    }
+  }, [mindMapData, hoveredNodeData]);
 
   return (
-    <div className="navigation-panel">
-      <ul>
-        {path.map((nodeName, index) => (
-          <li key={index} style={{ paddingLeft: `${index * 20}px` }}>
-            {nodeName}
-          </li>
-        ))}
-        {siblings.map((siblingName, index) => (
-          <li
-            key={index}
-            className={siblingName === parentNodeName ? 'active-parent' : ''}
-            style={{ paddingLeft: `${(path.length) * 20}px` }}
-          >
-            {siblingName}
-          </li>
-        ))}
-      </ul>
+    <div className="partition-nav-container">
+      <svg ref={svgRef} width="100%" height="100%"></svg>
     </div>
   );
 };
 
-export default NavigationPanel;
+export default PartitionNav;
 ```
 
-#### **Step 2: Create `NavigationPanel.css`**
+#### **Step 2: Create `PartitionNav.css`**
 
 This file styles the navigation panel.
 
 ```css
-/* src/components/NavigationPanel.css */
-.navigation-panel {
+/* src/components/PartitionNav.css */
+.partition-nav-container {
   position: absolute;
   top: 10px;
   left: 10px;
+  width: 300px;
+  height: 400px;
   background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}
-
-.navigation-panel ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.navigation-panel li {
-  font-family: sans-serif;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.navigation-panel li.active-parent {
-  font-weight: bold;
-  color: #3182ce;
 }
 ```
 
 #### **Step 3: Integrate into `MindMapCanvas.tsx`**
 
-Update the main canvas component to manage and display the navigation panel.
+Update the main canvas component to manage and display the new partition navigation panel.
 
 ```typescript
 // In MindMapCanvas.tsx
 
-// 1. Add state for the hovered path
-const [hoveredPath, setHoveredPath] = useState<string[]>([]);
-const [hoveredSiblings, setHoveredSiblings] = useState<string[]>([]);
-const [hoveredParent, setHoveredParent] = useState<string | null>(null);
+// 1. Add state for the hovered node data
+const [hoveredNodeData, setHoveredNodeData] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
 
 // 2. Update mouse event handlers
 const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
-    if (pinnedNode || d.depth === 0) return;
-    applyHighlight(d);
-    
-    const parent = d.parent;
-    if (parent) {
-        const grandParent = parent.parent;
-        if (grandParent) {
-            const grandParentPath = grandParent.ancestors().map((node: any) => node.data.text).reverse();
-            setHoveredPath(grandParentPath);
-            const siblings = grandParent.children?.map((node: any) => node.data.text) || [];
-            setHoveredSiblings(siblings);
-        } else {
-            // Parent is a child of the root
-            setHoveredPath([]);
-            const root = d.ancestors().find((node: any) => node.depth === 0);
-            if (root) {
-                const siblings = root.children?.map((node: any) => node.data.text) || [];
-                setHoveredSiblings(siblings);
-            } else {
-                setHoveredSiblings([]);
-            }
-        }
-        setHoveredParent(parent.data.text);
-    } else {
-      setHoveredPath([]);
-      setHoveredSiblings([]);
-      setHoveredParent(null);
+    if (pinnedNode) return;
+
+    if (!d.children) { // It's a leaf node
+        // ... highlighting logic for main canvas
+    } else { // It's an internal node
+        if (d.depth === 0) return;
+        applyHighlight(d);
     }
+    
+    setHoveredNodeData(d);
 }, [pinnedNode, applyHighlight]);
 
 const handleMouseOut = useCallback(() => {
   if (pinnedNode) return;
   clearAllHighlights();
-  setHoveredPath([]);
-  setHoveredSiblings([]);
-  setHoveredParent(null);
+  setHoveredNodeData(null);
 }, [pinnedNode, clearAllHighlights]);
 
 // 3. Render the component
 return (
   <div className="mind-map-container">
-    <NavigationPanel path={hoveredPath} siblings={hoveredSiblings} parentNodeName={hoveredParent} />
+    {mindMapData && <PartitionNav mindMapDta={mindMapData} hoveredNodeData={hoveredNodeData} />}
     <svg ref={svgRef} width="100%" height="100%"></svg>
   </div>
 );
