@@ -21,3 +21,8 @@
   font-size: 14px;
   white-space: nowrap;
 }
+
+.navigation-panel li.active-parent {
+  font-weight: bold;
+  color: #3182ce;
+}
