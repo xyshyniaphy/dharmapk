@@ -563,11 +563,11 @@ svg.call(zoom);
 
 ### **Part 7: Navigation Panel**
 
-This feature displays the path from the root to the currently hovered node.
+This feature displays the path from the root to the parent of the currently hovered node, and also displays the siblings of the parent node.
 
 #### **Step 1: Create `NavigationPanel.tsx`**
 
-This component renders the path.
+This component renders the path and the siblings.
 
 ```typescript
 // src/components/NavigationPanel.tsx
@@ -576,10 +576,12 @@ import './NavigationPanel.css';
 
 interface NavigationPanelProps {
   path: string[];
+  siblings: string[];
+  parentNodeName: string | null;
 }
 
-const NavigationPanel: React.FC<NavigationPanelProps> = ({ path }) => {
-  if (path.length === 0) {
+const NavigationPanel: React.FC<NavigationPanelProps> = ({ path, siblings, parentNodeName }) => {
+  if (path.length === 0 && siblings.length === 0) {
     return null;
   }
 
@@ -589,6 +591,15 @@ const NavigationPanel: React.FC<NavigationPanelProps> = ({ path }) => {
         {path.map((nodeName, index) => (
           <li key={index} style={{ paddingLeft: `${index * 20}px` }}>
             {nodeName}
+          </li>
+        ))}
+        {siblings.map((siblingName, index) => (
+          <li
+            key={index}
+            className={siblingName === parentNodeName ? 'active-parent' : ''}
+            style={{ paddingLeft: `${(path.length) * 20}px` }}
+          >
+            {siblingName}
           </li>
         ))}
       </ul>
@@ -628,6 +639,11 @@ This file styles the navigation panel.
   font-size: 14px;
   white-space: nowrap;
 }
+
+.navigation-panel li.active-parent {
+  font-weight: bold;
+  color: #3182ce;
+}
 ```
 
 #### **Step 3: Integrate into `MindMapCanvas.tsx`**
@@ -639,25 +655,53 @@ Update the main canvas component to manage and display the navigation panel.
 
 // 1. Add state for the hovered path
 const [hoveredPath, setHoveredPath] = useState<string[]>([]);
+const [hoveredSiblings, setHoveredSiblings] = useState<string[]>([]);
+const [hoveredParent, setHoveredParent] = useState<string | null>(null);
 
 // 2. Update mouse event handlers
 const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
-  if (pinnedNode || d.depth === 0) return;
-  applyHighlight(d);
-  const path = d.ancestors().map((node: any) => node.data.text).reverse();
-  setHoveredPath(path.slice(0, -1)); // Exclude the hovered node itself
+    if (pinnedNode || d.depth === 0) return;
+    applyHighlight(d);
+    
+    const parent = d.parent;
+    if (parent) {
+        const grandParent = parent.parent;
+        if (grandParent) {
+            const grandParentPath = grandParent.ancestors().map((node: any) => node.data.text).reverse();
+            setHoveredPath(grandParentPath);
+            const siblings = grandParent.children?.map((node: any) => node.data.text) || [];
+            setHoveredSiblings(siblings);
+        } else {
+            // Parent is a child of the root
+            setHoveredPath([]);
+            const root = d.ancestors().find((node: any) => node.depth === 0);
+            if (root) {
+                const siblings = root.children?.map((node: any) => node.data.text) || [];
+                setHoveredSiblings(siblings);
+            } else {
+                setHoveredSiblings([]);
+            }
+        }
+        setHoveredParent(parent.data.text);
+    } else {
+      setHoveredPath([]);
+      setHoveredSiblings([]);
+      setHoveredParent(null);
+    }
 }, [pinnedNode, applyHighlight]);
 
 const handleMouseOut = useCallback(() => {
   if (pinnedNode) return;
   clearAllHighlights();
   setHoveredPath([]);
+  setHoveredSiblings([]);
+  setHoveredParent(null);
 }, [pinnedNode, clearAllHighlights]);
 
 // 3. Render the component
 return (
   <div className="mind-map-container">
-    <NavigationPanel path={hoveredPath} />
+    <NavigationPanel path={hoveredPath} siblings={hoveredSiblings} parentNodeName={hoveredParent} />
     <svg ref={svgRef} width="100%" height="100%"></svg>
   </div>
 );
