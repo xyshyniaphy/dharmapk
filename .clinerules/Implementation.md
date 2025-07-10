@@ -737,3 +737,20 @@ This section defines the specific highlighting behavior for user interactions. T
     - All hover effects are disabled.
     - The highlighting for the pinned node and its related path will persist until it is unpinned.
 - **Purpose**: To allow the user to lock a specific view for closer examination.
+
+### **Part 9: Layout Algorithm**
+
+The project uses a custom auto-layout algorithm with the following key features:
+- **Orientation**: Left-to-right tree structure.
+- **Node Sizing**: Leaf and non-leaf nodes have distinct, fixed widths. Node height is dynamic based on content.
+- **Columnar Alignment**:
+    - All leaf nodes are aligned in the rightmost column.
+    - Non-leaf nodes are positioned based on their depth.
+    - A parent node is vertically centered relative to its children.
+- **Connection Lines**: Supports straight, elbow, and curved connectors.
+
+### **Part 10: Positioning and Sizing Restrictions**
+
+To ensure a consistent and predictable layout, the following restrictions must be adhered to:
+- **Use Absolute Units**: All positioning and sizing values must be specified in absolute units (e.g., `px`). Relative units (e.g., `em`, `rem`) are not allowed, as they can lead to unpredictable results.
+- **Line Height**: The line height for multi-line text must be specified in absolute units to ensure consistent vertical spacing.

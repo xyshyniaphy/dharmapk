@@ -142,6 +142,9 @@ The project uses a custom auto-layout algorithm with the following key features:
     - Non-leaf nodes are positioned based on their depth.
     - A parent node is vertically centered relative to its children.
 - **Connection Lines**: Supports straight, elbow, and curved connectors.
+- **Positioning and Sizing Restrictions**:
+    - **Use Absolute Units**: All positioning and sizing values must be specified in absolute units (e.g., `px`). Relative units (e.g., `em`, `rem`) are not allowed, as they can lead to unpredictable results.
+    - **Line Height**: The line height for multi-line text must be specified in absolute units to ensure consistent vertical spacing.
 
 ### 中文
 
@@ -153,6 +156,9 @@ The project uses a custom auto-layout algorithm with the following key features:
     - 非叶节点根据其深度定位。
     - 父节点相对于其子节点垂直居中。
 - **连接线**: 支持直线、肘形和曲线连接器。
+- **定位和大小限制**:
+    - **使用绝对单位**: 所有定位和大小值必须以绝对单位（例如 `px`）指定。不允许使用相对单位（例如 `em`、`rem`），因为它们可能导致不可预测的结果。
+    - **行高**: 多行文本的行高必须以绝对单位指定，以确保一致的垂直间距。
 
 ---
 

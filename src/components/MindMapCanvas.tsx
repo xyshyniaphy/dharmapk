@@ -132,48 +132,61 @@ function MindMapCanvas(): React.ReactElement {
       const height = svgRef.current.clientHeight;
       
       const root = d3.hierarchy(mindMapData);
+      const nodeWidth = settings.nodeColumnWidth;
 
-      // Custom layout logic with dynamic row height for leaf nodes
-      const baseNodeHeight = 40; // Base height for a single-line node
-      const lineHeight = 15;    // Additional height for each extra line
-      const nodeWidth = settings.nodeColumnWidth;    // Horizontal spacing between depth levels
-
+      // 1. Find max depth
       let maxDepth = 0;
-      root.each(d => {
-        if (d.depth > maxDepth) {
-          maxDepth = d.depth;
+      root.each(node => {
+        if (node.depth > maxDepth) {
+          maxDepth = node.depth;
         }
       });
 
-      const leaves = root.leaves();
+      // 2. Set y coordinates to align leaf nodes
+      root.each(node => {
+        if (!node.children) { // Is a leaf
+          (node as any).y = maxDepth * nodeWidth;
+        } else {
+          (node as any).y = node.depth * nodeWidth;
+        }
+      });
+
+      // 3. Calculate x coordinates for a compact layout
+      const baseNodeHeight = 20; // Base height for a node
+      const lineHeight = 15;     // Height of a single line of text
+      const nodePadding = 10;    // Padding between nodes
       let currentX = 0;
 
-      leaves.forEach(leaf => {
-        const numLines = leaf.data.text.split('\n').length;
-        const nodeHeight = baseNodeHeight + (numLines - 1) * lineHeight;
-        
-        // Assign position, centering the node within its allocated space
-        (leaf as any).x = currentX + nodeHeight / 2;
-        (leaf as any).y = maxDepth * nodeWidth;
-        
-        // Move the starting point for the next node
-        currentX += nodeHeight;
-      });
+      // Position leaves first, based on their content height
+      if (root.leaves().length > 0) {
+        root.leaves().forEach(leaf => {
+          const numLines = leaf.data.text.split('\n').length;
+          const textHeight = baseNodeHeight + (numLines - 1) * lineHeight;
+          leaf.x = currentX + textHeight / 2;
+          currentX += textHeight + nodePadding;
+        });
+      } else if (root.x === undefined) {
+        root.x = 0;
+      }
 
-      const layoutHeight = currentX;
-      const yOffset = (height - layoutHeight) / 2;
-
-      // Apply the vertical offset to all nodes to center the layout
-      root.each(d => {
-        if (!isNaN((d as any).x)) {
-          (d as any).x += yOffset;
+      // Position internal nodes based on their children's average position
+      root.eachAfter(node => {
+        if (node.children && node.children.length > 0) {
+          const meanX = d3.mean(node.children, d => d.x);
+          if (meanX !== undefined) {
+            node.x = meanX;
+          }
+        } else if (node.x === undefined) {
+          node.x = 0;
         }
       });
 
-      root.eachAfter(node => {
-        if (node.children) {
-          (node as any).x = d3.mean(node.children, d => (d as any).x);
-          (node as any).y = node.depth * nodeWidth;
+      // Center the entire tree vertically in the SVG
+      const totalHeight = currentX;
+      const yOffset = (height - totalHeight) / 2;
+      root.each(node => {
+        if (node.x !== undefined) {
+          node.x += yOffset;
         }
       });
 
@@ -231,6 +244,7 @@ function MindMapCanvas(): React.ReactElement {
         .each(function(d) {
           const text = d3.select(this);
           const lines = d.data.text.split('\n');
+          const lineHeight = 18; // Use a fixed pixel value for line height
           text.text(null);
 
           if (settings.verticalText && d.children) {
@@ -240,14 +254,15 @@ function MindMapCanvas(): React.ReactElement {
             for (let i = 0; i < chars.length; i++) {
               text.append('tspan')
                 .attr('x', d.children ? -13 : 13)
-                .attr('dy', '1.2em')
+                .attr('dy', `${lineHeight}px`)
                 .text(chars[i]);
             }
           } else {
+            const startY = -(lines.length - 1) * 0.5 * lineHeight;
             for (let i = 0; i < lines.length; i++) {
               text.append('tspan')
                 .attr('x', d.children ? -13 : 13)
-                .attr('dy', i === 0 ? '0.35em' : '1.2em')
+                .attr('dy', i === 0 ? `${startY}px` : `${lineHeight}px`)
                 .text(lines[i]);
             }
           }
@@ -260,7 +275,7 @@ function MindMapCanvas(): React.ReactElement {
         });
 
       svg.call(zoom);
-      svg.call(zoom.transform, d3.zoomIdentity.translate(100, yOffset > 0 ? yOffset : 0));
+      svg.call(zoom.transform, d3.zoomIdentity.translate(100, 0));
     }
   }, [mindMapData, settings, handleContextMenu, handleMouseOver, handleMouseOut, handleNodeClick, applyHighlight, clearAllHighlights]);
 
