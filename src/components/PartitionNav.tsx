@@ -57,41 +57,37 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
         const cellWidth = d.y1 - d.y0;
         const cellHeight = d.x1 - d.x0;
 
-        if (d.depth < 2) { // Horizontal text for root and direct children
-          group.append('text')
-            .attr('x', cellWidth / 2)
-            .attr('y', cellHeight / 2)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
-            .text(d.data.text)
-            .style('font-size', '12px')
-            .attr('fill', 'black');
-        } else { // Vertical text for deeper nodes
-          const text = group.append('text')
-            .attr('transform', `translate(${cellWidth / 2}, ${cellHeight / 2})`)
-            .attr('text-anchor', 'middle')
-            .style('font-size', '12px')
-            .attr('fill', 'black');
+        const text = group.append('text')
+          .attr('transform', `translate(${cellWidth / 2}, ${cellHeight / 2})`)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '12px')
+          .attr('fill', 'black');
 
-          const words = d.data.text.split('').map((char, i) => ({ char, i }));
-          const lineHeight = 1.2;
-          const totalHeight = (words.length - 1) * lineHeight;
-          
-          text.selectAll('tspan')
-            .data(words)
-            .join('tspan')
-            .attr('x', 0)
-            .attr('dy', (word, i) => i === 0 ? `-${totalHeight / 2}em` : `${lineHeight}em`)
-            .text(d => d.char);
-        }
+        const words = d.data.text.split('').map((char, i) => ({ char, i }));
+        const lineHeight = 1.2;
+        const totalHeight = (words.length - 1) * lineHeight;
+        
+        text.selectAll('tspan')
+          .data(words)
+          .join('tspan')
+          .attr('x', 0)
+          .attr('dy', (word, i) => i === 0 ? `-${totalHeight / 2}em` : `${lineHeight}em`)
+          .text(d => d.char);
       });
 
-      if (hoveredNodeData) {
+      const allNodes = g.selectAll('g');
+      const allRects = allNodes.selectAll('rect');
+      const allTexts = allNodes.selectAll('text');
+
+      if (hoveredNodeData && !hoveredNodeData.children) { // Only apply rules for leaf nodes
         const hoveredAncestors = new Set(hoveredNodeData.ancestors().map(n => n.data.id));
-        g.selectAll('g')
-          .style('visibility', d => hoveredAncestors.has((d as any).data.id) ? 'visible' : 'hidden');
+        
+        allRects.attr('fill', d => hoveredAncestors.has((d as any).data.id) ? 'lightgreen' : 'none');
+        allTexts.style('visibility', d => hoveredAncestors.has((d as any).data.id) ? 'visible' : 'hidden');
+
       } else {
-        g.selectAll('g').style('visibility', 'visible');
+        allRects.attr('fill', 'none');
+        allTexts.style('visibility', 'visible');
       }
     }
   }, [mindMapData, hoveredNodeData, width]);
