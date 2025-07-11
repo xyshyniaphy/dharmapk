@@ -7,6 +7,14 @@ interface XmindJsonNode {
   children?: {
     attached?: XmindJsonNode[];
   };
+  // Added style property to XmindJsonNode interface - 2025-07-11
+  style?: {
+    properties: {
+      'fo:color'?: string;
+      'svg:fill'?: string;
+      [key: string]: any;
+    };
+  };
 }
 
 function parseXmindJsonNode(xmindNode: XmindJsonNode): Node {
@@ -16,6 +24,16 @@ function parseXmindJsonNode(xmindNode: XmindJsonNode): Node {
     children: [],
     attributes: {},
   };
+
+  // Extract color information from xmindNode.style.properties - 2025-07-11
+  if (xmindNode.style && xmindNode.style.properties) {
+    if (xmindNode.style.properties['fo:color']) {
+      node.attributes!.textColor = xmindNode.style.properties['fo:color'];
+    }
+    if (xmindNode.style.properties['svg:fill']) {
+      node.attributes!.backgroundColor = xmindNode.style.properties['svg:fill'];
+    }
+  }
 
   if (xmindNode.children && xmindNode.children.attached) {
     node.children = xmindNode.children.attached.map(parseXmindJsonNode);
