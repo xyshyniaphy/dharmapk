@@ -563,15 +563,15 @@ svg.call(zoom);
 
 ### **Part 7: Partition Navigation Panel**
 
-This feature displays a hierarchical overview of the mind map using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the currently hovered node in the main canvas.
+This feature displays a hierarchical overview of the mind map using a D3 partition layout. It is always visible and occupies the left 50% of the screen.
 
-#### **Step 1: Create `PartitionNav.tsx`**
+#### **Step 1: `PartitionNav.tsx` Implementation**
 
-This component encapsulates the D3 partition layout logic. It preserves the original node order from the data file by not applying any sorting.
+This component encapsulates the D3 partition layout logic, text rendering, and hover interactions.
 
 ```typescript
 // src/components/PartitionNav.tsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import type { Node as MindMapNode } from '../types';
 import './PartitionNav.css';
@@ -583,14 +583,21 @@ interface PartitionNavProps {
 
 const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeData }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    if (mindMapData && svgRef.current) {
+    if (containerRef.current) {
+      setWidth(containerRef.current.clientWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mindMapData && svgRef.current && containerRef.current && width > 0) {
       const svg = d3.select(svgRef.current);
       svg.selectAll('*').remove();
 
-      const width = 300;
-      const height = svg.node()?.clientHeight || 400;
+      const { clientHeight: height } = containerRef.current;
       const margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
       const partitionLayout = d3.partition<MindMapNode>()
@@ -598,11 +605,10 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
         .padding(1);
 
       const root = partitionLayout(d3.hierarchy<MindMapNode>(mindMapData)
-        .sum(d => (!d.children || d.children.length === 0) ? 1 : 0)); // Correctly count leaf nodes
+        .sum(() => 1));
 
       const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
-      // Filter for non-leaf nodes as per the original requirement
       const nodes = root.descendants().filter(d => d.children && d.children.length > 0) as d3.HierarchyRectangularNode<MindMapNode>[];
 
       const node = g.selectAll('g')
@@ -616,29 +622,54 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
         .attr('fill', 'none')
         .attr('stroke', '#ccc');
 
-      // Add a title for tooltips on hover
       node.append('title')
         .text(d => `${d.ancestors().map(n => n.data.text).reverse().join(" / ")}\nValue: ${d.value}`);
 
-      // Add labels, filtering for cells that are large enough
-      node.filter(d => (d.y1 - d.y0) > 40) // Only show text if the cell is wide enough
-        .append('text')
-        .attr('x', 5)
-        .attr('y', 15)
-        .text(d => d.data.text)
-        .attr('fill', 'black')
-        .style('font-size', '12px');
+      node.each(function(d) {
+        const group = d3.select(this);
+        const cellWidth = d.y1 - d.y0;
+        const cellHeight = d.x1 - d.x0;
 
-      if (hoveredNodeData) {
+        const text = group.append('text')
+          .attr('transform', `translate(${cellWidth / 2}, ${cellHeight / 2})`)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '12px')
+          .attr('fill', 'black');
+
+        const words = d.data.text.split('').map((char, i) => ({ char, i }));
+        const lineHeight = 1.2;
+        const totalHeight = (words.length - 1) * lineHeight;
+        
+        text.selectAll('tspan')
+          .data(words)
+          .join('tspan')
+          .attr('x', 0)
+          .attr('dy', (word, i) => i === 0 ? `-${totalHeight / 2}em` : `${lineHeight}em`)
+          .text(d => d.char);
+      });
+
+      const allNodes = g.selectAll('g');
+      const allRects = allNodes.selectAll('rect');
+      const allTexts = allNodes.selectAll('text');
+
+      if (hoveredNodeData && !hoveredNodeData.children) { // Only apply rules for leaf nodes
         const hoveredAncestors = new Set(hoveredNodeData.ancestors().map(n => n.data.id));
-        node.selectAll<SVGRectElement, d3.HierarchyRectangularNode<MindMapNode>>('rect')
-          .attr('fill', d => hoveredAncestors.has(d.data.id) ? 'rgba(49, 130, 206, 0.3)' : 'none');
+        
+        allRects.attr('fill', d => hoveredAncestors.has((d as any).data.id) ? 'lightgreen' : 'none');
+        allTexts.style('visibility', d => hoveredAncestors.has((d as any).data.id) ? 'visible' : 'hidden');
+
+      } else {
+        allRects.attr('fill', 'none');
+        allTexts.style('visibility', 'visible');
       }
     }
-  }, [mindMapData, hoveredNodeData]);
+  }, [mindMapData, hoveredNodeData, width]);
 
   return (
-    <div className="partition-nav-container">
+    <div
+      ref={containerRef}
+      className="partition-nav-container"
+    >
       <svg ref={svgRef} width="100%" height="100%"></svg>
     </div>
   );
@@ -647,9 +678,9 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
 export default PartitionNav;
 ```
 
-#### **Step 2: Create `PartitionNav.css`**
+#### **Step 2: `PartitionNav.css` Styling**
 
-This file styles the navigation panel.
+This file styles the navigation panel, fixing its width to 50% of the viewport.
 
 ```css
 /* src/components/PartitionNav.css */
@@ -657,9 +688,9 @@ This file styles the navigation panel.
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 300px;
-  height: 400px;
-  background-color: rgba(255, 255, 255, 0.9);
+  width: 50vw;
+  height: calc(100% - 20px);
+  background-color: rgba(240, 240, 240, 0.95);
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -667,44 +698,27 @@ This file styles the navigation panel.
 }
 ```
 
-#### **Step 3: Integrate into `MindMapCanvas.tsx`**
+#### **Step 3: Highlighting and Visibility Logic**
 
-Update the main canvas component to manage and display the new partition navigation panel.
+The highlighting logic is now strictly defined and enforced within the component.
 
-```typescript
-// In MindMapCanvas.tsx
+-   **Default State (No Hover)**:
+    -   All cell borders are visible.
+    -   All cell backgrounds are transparent (`none`).
+    -   All node text is visible.
+-   **Hovering on a Leaf Node**:
+    -   The `hoveredNodeData` prop is checked to see if it's a leaf (`!hoveredNodeData.children`).
+    -   An ancestor set is created from the hovered leaf node.
+    -   **Cell Background**: The `fill` of the `rect` elements is set to `lightgreen` if the node is an ancestor, otherwise it's `none`.
+    -   **Text Visibility**: The `visibility` style of the `text` elements is set to `visible` if the node is an ancestor, otherwise it's `hidden`.
+-   **Hovering on an Internal (Non-Leaf) Node**:
+    -   The panel reverts to the default state. No special highlighting is applied.
 
-// 1. Add state for the hovered node data
-const [hoveredNodeData, setHoveredNodeData] = useState<d3.HierarchyPointNode<MindMapNode> | null>(null);
+#### **Step 4: Text Rendering**
 
-// 2. Update mouse event handlers
-const handleMouseOver = useCallback((_event: MouseEvent, d: any) => {
-    if (pinnedNode) return;
-
-    if (!d.children) { // It's a leaf node
-        // ... highlighting logic for main canvas
-    } else { // It's an internal node
-        if (d.depth === 0) return;
-        applyHighlight(d);
-    }
-    
-    setHoveredNodeData(d);
-}, [pinnedNode, applyHighlight]);
-
-const handleMouseOut = useCallback(() => {
-  if (pinnedNode) return;
-  clearAllHighlights();
-  setHoveredNodeData(null);
-}, [pinnedNode, clearAllHighlights]);
-
-// 3. Render the component
-return (
-  <div className="mind-map-container">
-    {mindMapData && <PartitionNav mindMapDta={mindMapData} hoveredNodeData={hoveredNodeData} />}
-    <svg ref={svgRef} width="100%" height="100%"></svg>
-  </div>
-);
-```
+-   All node text is rendered vertically, character by character, using `<tspan>` elements.
+-   The text block is centered horizontally and vertically within its parent cell.
+-   This ensures a consistent appearance for all nodes in the partition layout, regardless of depth.
 
 -----
 

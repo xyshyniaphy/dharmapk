@@ -239,7 +239,10 @@ The application features a sophisticated interaction model to enhance usability.
 -   **Hovering an Internal Node**: Highlights the node's ancestors and descendants to show the complete sub-tree and its lineage.
 -   **Hovering a Leaf Node**: Bolds the node's text, highlights the path to the root, and keeps its siblings visible, while dimming all other elements. This focuses on the node's specific context.
 -   **Click to Pin**: A left-click on any node "pins" its highlighted state, disabling hover effects until it is unpinned by clicking it again or by right-clicking anywhere on the canvas.
--   **Partition Navigation Panel**: A hierarchical overview of the mind map is displayed using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the currently hovered node in the main canvas. The original node order from the data file is preserved.
+-   **Partition Navigation Panel**: A hierarchical overview of the mind map is displayed using a D3 partition layout. It is always visible and occupies 50% of the screen width.
+    -   **Text Rendering**: All node text is rendered vertically to maximize readability in the partition layout.
+    -   **Hover Interaction (Leaf Nodes)**: When hovering over a leaf node in the main canvas, the corresponding ancestor path in the navigation panel is highlighted with a light green background, and only the text for those ancestors becomes visible. All other nodes' text is hidden to reduce clutter.
+    -   **Hover Interaction (Non-Leaf Nodes)**: When hovering over a non-leaf node or not hovering at all, the panel displays all nodes with a normal background and visible text.
 
 ### 中文
 
@@ -248,7 +251,10 @@ The application features a sophisticated interaction model to enhance usability.
 -   **悬停内部节点**: 突出显示节点的祖先和后代，以显示完整的子树及其谱系。
 -   **悬停叶子节点**: 加粗节点文本，突出显示到根节点的路径，并保持其兄弟节点可见，同时使所有其他元素变暗。这有助于关注节点的特定上下文。
 -   **点击固定**: 在任何节点上单击鼠标左键可“固定”其高亮状态，禁用悬停效果，直到再次单击它或在画布上的任何位置单击鼠标右键取消固定。
--   **分区导航面板**: 使用 D3 分区布局显示思维导图的层次结构概览。它渲染所有非叶子节点，并高亮显示到悬停节点的路径。保留了数据文件中的原始节点顺序。
+-   **分区导航面板**: 使用 D3 分区布局显示思维导图的层次结构概览。它始终可见，并占据屏幕宽度的50%。
+    -   **文本渲染**: 所有节点文本都垂直渲染，以最大化在分区布局中的可读性。
+    -   **悬停交互 (叶节点)**: 当在主画布中悬停在叶节点上时，导航面板中相应的祖先路径会以浅绿色背景高亮显示，并且只有这些祖先的文本变得可见。所有其他节点的文本都被隐藏以减少混乱。
+    -   **悬停交互 (非叶节点)**: 当悬停在非叶节点上或根本不悬停时，面板会显示所有节点，背景正常，文本可见。
 
 ---
 
@@ -293,7 +299,9 @@ The application features a sophisticated interaction model to enhance usability.
 - The core data flow and component structure have been planned.
 - All parsers for `.xmind`, `.mm`, and `.mind` files are implemented.
 - Interactive features like hover highlighting, click-to-pin, and zoom/pan are fully functional.
-- A navigation panel that displays a hierarchical overview of the mind map using a D3 partition layout. It renders all non-leaf nodes and highlights the path to the hovered node. The original node order from the data file is preserved.
+- A fixed-width (50vw) navigation panel that displays a hierarchical overview using a D3 partition layout.
+  - Features advanced hover interactions: highlighting the ancestor path of a hovered leaf node with a light green background and showing only the text for that path.
+  - Renders all node text vertically for consistent and clear presentation.
 
 **What's Left to Build:**
 - Styling improvements.
@@ -311,7 +319,9 @@ The application features a sophisticated interaction model to enhance usability.
 - 核心数据流和组件结构已规划好。
 - `.xmind`、`.mm` 和 `.mind` 文件的所有解析器均已实现。
 - 悬停高亮、点击固定和缩放/平移等交互功能已完全实现。
-- 一个导航面板，使用 D3 分区布局显示思维导图的层次结构概览。它渲染所有非叶子节点，并高亮显示到悬停节点的路径。保留了数据文件中的原始节点顺序。
+- 一个固定宽度 (50vw) 的导航面板，使用 D3 分区布局显示思维导图的层次结构概览。
+  - 具有高级悬停交互功能：用浅绿色背景高亮显示悬停叶节点的祖先路径，并仅显示该路径的文本。
+  - 所有节点文本均垂直渲染，以实现一致清晰的呈现。
 
 **待构建的内容:**
 - 样式改进。
