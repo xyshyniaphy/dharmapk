@@ -57,22 +57,34 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
         const cellWidth = d.y1 - d.y0;
         const cellHeight = d.x1 - d.x0;
 
-        const text = group.append('text')
-          .attr('transform', `translate(${cellWidth / 2}, ${cellHeight / 2})`)
-          .attr('text-anchor', 'middle')
-          .style('font-size', '12px')
-          .attr('fill', 'black');
+        const isParentOfLeaf = d.children && d.children.some(child => !child.children);
 
-        const words = d.data.text.split('').map((char, i) => ({ char, i }));
-        const lineHeight = 1.2;
-        const totalHeight = (words.length - 1) * lineHeight;
-        
-        text.selectAll('tspan')
-          .data(words)
-          .join('tspan')
-          .attr('x', 0)
-          .attr('dy', (word, i) => i === 0 ? `-${totalHeight / 2}em` : `${lineHeight}em`)
-          .text(d => d.char);
+        if (isParentOfLeaf) { // Horizontal text for parents of leaf nodes, aligned left
+          group.append('text')
+            .attr('x', 5) // Left padding
+            .attr('y', cellHeight / 2)
+            .attr('text-anchor', 'start')
+            .attr('dominant-baseline', 'middle')
+            .text(d.data.text)
+            .style('font-size', '12px')
+            .attr('fill', 'black');
+        } else { // Vertical text for other nodes, aligned top
+          const text = group.append('text')
+            .attr('transform', `translate(${cellWidth / 2}, 15)`) // Top padding
+            .attr('text-anchor', 'middle')
+            .style('font-size', '12px')
+            .attr('fill', 'black');
+
+          const words = d.data.text.split('').map((char, i) => ({ char, i }));
+          const lineHeight = 1.2;
+          
+          text.selectAll('tspan')
+            .data(words)
+            .join('tspan')
+            .attr('x', 0)
+            .attr('dy', (word, i) => i === 0 ? '0' : `${lineHeight}em`)
+            .text(d => d.char);
+        }
       });
 
       const allNodes = g.selectAll('g');

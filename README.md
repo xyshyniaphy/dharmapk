@@ -240,7 +240,7 @@ The application features a sophisticated interaction model to enhance usability.
 -   **Hovering a Leaf Node**: Bolds the node's text, highlights the path to the root, and keeps its siblings visible, while dimming all other elements. This focuses on the node's specific context.
 -   **Click to Pin**: A left-click on any node "pins" its highlighted state, disabling hover effects until it is unpinned by clicking it again or by right-clicking anywhere on the canvas.
 -   **Partition Navigation Panel**: A hierarchical overview of the mind map is displayed using a D3 partition layout. It is always visible and occupies 50% of the screen width.
-    -   **Text Rendering**: All node text is rendered vertically to maximize readability in the partition layout.
+    -   **Text Rendering**: Text for parents of leaf nodes is rendered horizontally and left-aligned. Text for all other nodes is rendered vertically and top-aligned.
     -   **Hover Interaction (Leaf Nodes)**: When hovering over a leaf node in the main canvas, the corresponding ancestor path in the navigation panel is highlighted with a light green background, and only the text for those ancestors becomes visible. All other nodes' text is hidden to reduce clutter.
     -   **Hover Interaction (Non-Leaf Nodes)**: When hovering over a non-leaf node or not hovering at all, the panel displays all nodes with a normal background and visible text.
 

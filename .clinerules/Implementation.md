@@ -716,9 +716,9 @@ The highlighting logic is now strictly defined and enforced within the component
 
 #### **Step 4: Text Rendering**
 
--   All node text is rendered vertically, character by character, using `<tspan>` elements.
--   The text block is centered horizontally and vertically within its parent cell.
--   This ensures a consistent appearance for all nodes in the partition layout, regardless of depth.
+-   **Parents of Leaf Nodes**: Text is rendered horizontally, aligned to the left, and vertically centered within its cell.
+-   **Other Nodes**: Text is rendered vertically, character by character, using `<tspan>` elements. The text block is horizontally centered and aligned to the top of its parent cell.
+-   This ensures a consistent and readable appearance for all nodes in the partition layout, adapting to their hierarchical position.
 
 -----
 
