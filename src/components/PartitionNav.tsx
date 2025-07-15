@@ -82,7 +82,7 @@ const PartitionNav: React.FC<PartitionNavProps> = ({ mindMapData, hoveredNodeDat
             .data(words)
             .join('tspan')
             .attr('x', 0)
-            .attr('dy', (word, i) => i === 0 ? '0' : `${lineHeight}em`)
+            .attr('dy', (_d, i) => i === 0 ? '0' : `${lineHeight}em`)
             .text(d => d.char);
         }
       });

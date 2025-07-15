@@ -48,8 +48,7 @@ function MindMapCanvas(): React.ReactElement {
         // Get ancestors (path to root) and siblings
         const ancestors = d.ancestors();
         const ancestorSet = new Set(ancestors);
-        const parent = d.parent;
-        const siblings = parent ? parent.children || [] : [];
+        const siblings = d.parent ? d.parent.children || [] : [];
 
         // Determine which nodes should be visible (ancestors + siblings)
         const visibleNodes = new Set([...ancestors, ...siblings]);
@@ -69,7 +68,6 @@ function MindMapCanvas(): React.ReactElement {
         applyHighlight(d);
     }
     
-    const parent = d.parent;
     setHoveredNodeData(d);
   }, [pinnedNode, applyHighlight]);
 
